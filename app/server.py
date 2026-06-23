@@ -167,6 +167,62 @@ def my_vehicles():
         ]
     })
 
+# ── Tesla Fleet API ─────────────────────────────────────────────────
+from tesla_fleet import get_client as get_tesla_fleet
+
+_fleet = None
+def get_fleet():
+    global _fleet
+    if _fleet is None:
+        _fleet = get_tesla_fleet()
+    return _fleet
+
+@app.route("/api/tesla/auth")
+def tesla_auth_start():
+    """Start OAuth2 device authorization flow."""
+    result = get_fleet().start_auth()
+    return jsonify(result)
+
+@app.route("/api/tesla/auth/poll", methods=["POST"])
+def tesla_auth_poll():
+    """Poll for completed authorization."""
+    data = request.get_json() or {}
+    device_code = data.get("device_code", "")
+    interval = data.get("interval", 5)
+    result = get_fleet().poll_auth(device_code, interval)
+    return jsonify(result)
+
+@app.route("/api/tesla/status")
+def tesla_status():
+    """Return status of all Tesla API vehicles."""
+    fleet = get_fleet()
+    if not fleet.is_authorized:
+        return jsonify({"error": "Not authorized", "auth_status": fleet.auth_status})
+    vehicles = fleet.get_vehicles()
+    results = []
+    for v in vehicles:
+        status = fleet.get_vehicle_status(v["id"])
+        results.append({
+            "vin": v["vin"],
+            "display_name": v["display_name"],
+            "state": v["state"],
+            "status": status,
+        })
+    return jsonify({"vehicles": results, "auth_status": fleet.auth_status})
+
+@app.route("/api/tesla/vehicles")
+def tesla_vehicles():
+    """List vehicles on Tesla account."""
+    fleet = get_fleet()
+    if not fleet.is_authorized:
+        return jsonify({"error": "Not authorized"})
+    return jsonify({"vehicles": fleet.get_vehicles()})
+
+@app.route("/api/tesla/auth/status")
+def tesla_auth_status():
+    """Check Tesla API auth status."""
+    return jsonify(get_fleet().auth_status)
+
 # ── Diagnostics ──────────────────────────────────────────────────────
 @app.route("/api/diagnostics")
 def diagnostics():

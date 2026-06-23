@@ -372,6 +372,14 @@
       <label>Tailscale IP</label><input type="text" id="tsIp" placeholder="100.x.x.x">
       <label>DDNS 域名</label><input type="text" id="ddnsDomain" placeholder="mytesla.duckdns.org">
     </div>
+    <div class="section-label" style="font-size:11px;padding:12px 4px 4px;color:var(--onSurfaceMuted)">☁️ Tesla Fleet API</div>
+    <div class="settings-group">
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="teslaAuthStatus" style="font-size:12px;color:var(--onSurfaceDim)">未授权</span>
+        <button id="teslaAuthBtn" onclick="startTeslaAuth()" style="margin-left:auto;background:var(--accent);border:none;border-radius:var(--radiusXs);padding:6px 12px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">授权</button>
+      </div>
+      <div id="teslaAuthProgress" style="display:none;margin-top:8px;padding:10px;background:var(--surface3);border-radius:var(--radiusXs);font-size:11px;color:var(--onSurfaceDim);line-height:1.6"></div>
+    </div>
   </div>
 
   <!-- Diagnostics Panel -->
@@ -409,6 +417,19 @@
   <div class="handle"></div>
   <div class="add-form">
     <div class="af-title">➕ 添加车辆</div>
+
+    <!-- Connection Type -->
+    <label>连接方式</label>
+    <div class="mode-selector" id="connTypeSelector" style="grid-template-columns:1fr 1fr">
+      <div class="mode-chip active" data-mode="can" onclick="selectConnType('can')">🔌 CAN 总线</div>
+      <div class="mode-chip" data-mode="tesla" onclick="selectConnType('tesla')">☁️ Tesla API</div>
+    </div>
+
+    <!-- CAN Mode warning (Tesla API) -->
+    <div id="teslaApiNote" style="display:none;background:var(--accentDim);border-radius:var(--radiusXs);padding:10px;font-size:11px;color:var(--accent);margin-bottom:10px;line-height:1.5">
+      📖 只读模式 — Tesla Fleet API 读取车辆状态，不能发送控制命令。
+      请在设置中完成 OAuth 授权。
+    </div>
 
     <!-- Tab: VIN or Model -->
     <div class="add-tabs">
@@ -705,6 +726,14 @@ function switchAddMode(mode) {
   document.getElementById('addModeModel').style.display = mode==='model' ? 'block' : 'none';
 }
 
+/* ── Connection type switch ── */
+let _connType = 'can';
+function selectConnType(type) {
+  _connType = type;
+  document.querySelectorAll('#connTypeSelector .mode-chip').forEach(c => c.classList.toggle('active', c.dataset.mode === type));
+  document.getElementById('teslaApiNote').style.display = type === 'tesla' ? 'block' : 'none';
+}
+
 /* ── VIN input auto-trim ── */
 function onVinInput() {
   const v = document.getElementById('newVin');
@@ -917,6 +946,7 @@ function saveNewVehicle() {
     id: 'v_' + Date.now(),
     nick: nick || modelName,
     vin: vin,
+    connType: _connType,
     modelName: modelName,
     year: year,
     battery: battery,
@@ -1077,11 +1107,13 @@ function getActiveUrl() {
   return document.getElementById('serverUrl').value||'';
 }
 function getToken(){const t=document.getElementById('apiToken').value;localStorage.setItem('tsl_tok',t);return t}
-async function api(method,path){
+async function api(method,path,body){
   const url=getActiveUrl()+'/api/'+path;
   if(url.includes('x.x')||!url)return null;
   const h={'Content-Type':'application/json'};const t=getToken();if(t)h['X-Api-Token']=t;
-  try{const r=await fetch(url,{method,headers:h,signal:AbortSignal.timeout(5000)});if(!r.ok)return null;return await r.json()}catch(e){return null}
+  const opts={method,headers:h,signal:AbortSignal.timeout(8000)};
+  if(body&&method!=='GET')opts.body=JSON.stringify(body);
+  try{const r=await fetch(url,opts);if(!r.ok)return null;return await r.json()}catch(e){return null}
 }
 
 /* ── DIAGNOSTICS ── */
@@ -1257,6 +1289,79 @@ function navigateTo(name){
 function showVehiclePicker(){document.getElementById('pickerOverlay').classList.add('show');document.getElementById('pickerSheet').classList.add('show');renderVehiclePicker()}
 function hideVehiclePicker(){document.getElementById('pickerOverlay').classList.remove('show');document.getElementById('pickerSheet').classList.remove('show')}
 function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._hide);el._hide=setTimeout(()=>el.classList.remove('show'),2000)}
+
+/* ── Tesla Fleet API Auth ── */
+let _teslaDeviceCode = null;
+async function startTeslaAuth() {
+  const btn = document.getElementById('teslaAuthBtn');
+  const status = document.getElementById('teslaAuthStatus');
+  const progress = document.getElementById('teslaAuthProgress');
+  btn.disabled = true;
+  btn.textContent = '请求中...';
+  progress.style.display = 'block';
+  progress.innerHTML = '正在发起 OAuth 授权...';
+
+  const auth = await api('GET', 'tesla/auth');
+  if (!auth || auth.error) {
+    progress.innerHTML = '❌ 授权失败: ' + (auth?.error || '无法连接服务器');
+    btn.disabled = false; btn.textContent = '重试';
+    return;
+  }
+
+  _teslaDeviceCode = auth.device_code;
+  progress.innerHTML = ''
+    + '<div style="margin-bottom:8px">1. 打开此链接:</div>'
+    + '<div style="background:#000;padding:8px;border-radius:6px;word-break:break-all;font-size:10px;font-family:monospace;color:var(--accent);margin-bottom:8px">'
+    + (auth.verification_uri_complete || auth.verification_uri) + '</div>'
+    + '<div style="margin-bottom:8px">2. 输入代码: <strong style="font-size:16px;color:#fff">' + auth.user_code + '</strong></div>'
+    + '<div style="margin-bottom:8px">3. 登录你的 Tesla 账号</div>'
+    + '<div style="color:var(--onSurfaceMuted);font-size:10px">⏳ 等待授权完成...</div>';
+
+  btn.textContent = '等待中';
+  btn.disabled = true;
+
+  // Poll for completion
+  const interval = (auth.interval || 5) * 1000;
+  const maxAttempts = 60;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, interval));
+    const poll = await api('POST', 'tesla/auth/poll', {
+      device_code: _teslaDeviceCode,
+      interval: auth.interval || 5,
+    });
+    if (poll?.success) {
+      progress.innerHTML = '✅ 授权成功！正在获取车辆列表...';
+      status.textContent = '✅ 已授权';
+      status.style.color = 'var(--green)';
+      btn.textContent = '重新授权';
+      btn.disabled = false;
+      // Fetch vehicles
+      const vehicles = await api('GET', 'tesla/vehicles');
+      if (vehicles?.vehicles) {
+        progress.innerHTML += '<br>🚗 找到 ' + vehicles.vehicles.length + ' 辆车';
+        vehicles.vehicles.forEach(v => {
+          progress.innerHTML += '<br>• ' + (v.display_name || '未知') + ' (' + (v.vin || '').slice(-6) + ')';
+        });
+      }
+      return;
+    }
+    if (poll?.error === 'expired') {
+      progress.innerHTML = '⏰ 授权已过期，请重新开始';
+      btn.textContent = '重新授权';
+      btn.disabled = false;
+      return;
+    }
+    if (poll?.error) {
+      progress.innerHTML = '❌ 错误: ' + poll.error;
+      btn.textContent = '重试';
+      btn.disabled = false;
+      return;
+    }
+  }
+  progress.innerHTML = '⏰ 授权超时，请重新开始';
+  btn.textContent = '重新授权';
+  btn.disabled = false;
+}
 
 function init() {
   // ── Toolbar ──
