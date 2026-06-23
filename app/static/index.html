@@ -9,55 +9,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--bg:#000;--surface:#111;--surface2:#1a1a1a;--surface3:#242424;--onSurface:#fff;--onSurfaceDim:#888;--onSurfaceMuted:#555;--accent:#1a8cdb;--accentDim:rgba(26,140,219,.12);--green:#22c55e;--greenDim:rgba(34,197,94,.12);--red:#ef4444;--redDim:rgba(239,68,68,.12);--amber:#f59e0b;--radius:16px;--radiusSm:12px;--radiusXs:8px;--carBody:#1e1e2e;--carBodyLight:#2a2a3e;--glass:rgba(0,0,0,.5)}
+  :root{--bg:#000;--surface:#0d0d0d;--surface2:#141414;--surface3:#1c1c1e;--card:rgba(255,255,255,.04);--cardBorder:rgba(255,255,255,.06);--onSurface:#fff;--onSurfaceDim:#8e8e93;--onSurfaceMuted:#48484a;--accent:#1678FF;--accentDim:rgba(22,120,255,.12);--green:#30d158;--greenDim:rgba(48,209,88,.12);--red:#ff453a;--redDim:rgba(255,69,58,.12);--amber:#ff9f0a;--radius:16px;--radiusSm:12px;--radiusXs:8px;--radiusPill:100px}
   html,body{height:100%;-webkit-font-smoothing:antialiased}
-  body{font-family:'Inter',-apple-system,'PingFang HK','Helvetica Neue',sans-serif;background:var(--bg);color:var(--onSurface);overflow-x:hidden}
+  body{font-family:-apple-system,'Inter','PingFang HK','Helvetica Neue',sans-serif;background:var(--bg);color:var(--onSurface);overflow-x:hidden}
   ::-webkit-scrollbar{width:0;height:0}
-  .app{max-width:480px;margin:0 auto;min-height:100vh;padding:0 16px;padding-top:env(safe-area-inset-top,12px);padding-bottom:calc(env(safe-area-inset-bottom,16px)+80px)}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;padding:0 20px;padding-top:env(safe-area-inset-top,8px);padding-bottom:calc(env(safe-area-inset-bottom,16px)+90px)}
 
-  /* ── Status Bar ── */
-  .status-bar{display:flex;align-items:center;justify-content:flex-end;padding:8px 0 4px;font-size:12px;font-weight:500;color:var(--onSurfaceDim)}
-  .status-bar .conn{display:flex;align-items:center;gap:4px}
-  .status-bar .conn-dot{width:6px;height:6px;border-radius:50%}
-  .status-bar .conn-dot.online{background:var(--green)}
-  .status-bar .conn-dot.offline{background:var(--red)}
+  /* ── Top Bar ── */
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+  .top-bar .tb-left{display:flex;align-items:center;gap:8px}
+  .top-bar .tb-vehicle{font-size:16px;font-weight:700}
+  .top-bar .tb-vehicle .arrow{font-size:10px;color:var(--onSurfaceDim);margin-left:4px}
+  .top-bar .tb-conn{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radiusPill);padding:4px 10px 4px 6px;font-size:11px;font-weight:500;color:var(--onSurfaceDim)}
+  .top-bar .conn-dot{width:6px;height:6px;border-radius:50%}
+  .top-bar .conn-dot.online{background:var(--green)}
+  .top-bar .conn-dot.offline{background:var(--onSurfaceMuted)}
 
-  /* ── Vehicle Switcher ── */
-  .vehicle-switcher{display:flex;align-items:center;gap:8px;padding:4px 0;margin-bottom:2px}
-  .vehicle-switcher .vs-select{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:6px 12px 6px 6px;cursor:pointer}
-  .vehicle-switcher .vs-select:active{background:var(--surface3)}
-  .vehicle-switcher .vs-icon{font-size:22px;width:30px;text-align:center}
-  .vehicle-switcher .vs-name{font-size:13px;font-weight:600;flex:1}
-  .vehicle-switcher .vs-arrow{font-size:12px;color:var(--onSurfaceMuted)}
-  .vehicle-switcher .vs-add{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--onSurfaceDim)}
-  .vehicle-switcher .vs-add:active{background:var(--surface3)}
-
-  /* ── Dropdown ── */
-  .dropdown-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:none;animation:fadeIn .2s}
-  .dropdown-overlay.show{display:block}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  .dropdown-sheet{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px calc(env(safe-area-inset-bottom,16px)+16px);z-index:201;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:70vh;overflow-y:auto}
-  .dropdown-sheet.show{transform:translateY(0)}
-  .dropdown-sheet .handle{width:36px;height:4px;border-radius:2px;background:var(--surface3);margin:0 auto 16px}
-  .dropdown-sheet .title{font-size:16px;font-weight:700;margin-bottom:12px}
-  .dropdown-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--radiusSm);cursor:pointer;transition:all .12s;margin-bottom:4px}
-  .dropdown-item:active{background:var(--surface2)}
-  .dropdown-item.active{background:var(--accentDim);border:1px solid rgba(26,140,219,.15)}
-  .dropdown-item .di-icon{font-size:28px;width:40px;text-align:center}
-  .dropdown-item .di-info{flex:1}
-  .dropdown-item .di-name{font-size:14px;font-weight:600}
-  .dropdown-item .di-sub{font-size:11px;color:var(--onSurfaceDim);margin-top:2px}
-  .dropdown-item .di-check{color:var(--accent);font-size:14px;font-weight:700}
+  /* ── Battery / Status Card ── */
+  .status-card{background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radius);padding:16px;margin:4px 0 8px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .status-card .sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .status-card .sc-battery{display:flex;align-items:center;gap:12px}
+  .status-card .sc-battery .batt-ring{position:relative;width:48px;height:48px}
+  .status-card .sc-battery .batt-ring svg{transform:rotate(-90deg)}
+  .status-card .sc-battery .batt-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+  .status-card .sc-battery .batt-info{display:flex;flex-direction:column}
+  .status-card .sc-battery .batt-info .range{font-size:24px;font-weight:700;letter-spacing:-.5px}
+  .status-card .sc-battery .batt-info .range-unit{font-size:12px;font-weight:500;color:var(--onSurfaceDim);margin-left:2px}
+  .status-card .sc-battery .batt-info .sub{font-size:11px;color:var(--onSurfaceDim);margin-top:1px}
+  .status-card .sc-right{text-align:right}
+  .status-card .sc-right .temp{font-size:20px;font-weight:600}
+  .status-card .sc-right .temp-unit{font-size:12px;color:var(--onSurfaceDim)}
+  .status-card .sc-right .sub{font-size:11px;color:var(--onSurfaceMuted);margin-top:1px}
+  .status-card .sc-bottom{display:flex;gap:16px;margin-top:8px;padding-top:10px;border-top:1px solid var(--cardBorder)}
+  .status-card .sc-stat{flex:1;text-align:center}
+  .status-card .sc-stat .val{font-size:14px;font-weight:600}
+  .status-card .sc-stat .lbl{font-size:10px;color:var(--onSurfaceMuted);margin-top:1px}
 
   /* ── Car Visual ── */
-  .car-stage{position:relative;height:210px;display:flex;align-items:center;justify-content:center;margin:0 -16px;overflow:hidden}
-  .car-stage .glow{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:200px;height:80px;border-radius:50%;background:radial-gradient(ellipse,rgba(26,140,219,.08)0%,transparent 70%);transition:all .6s ease}
-  .car-stage .glow.unlocked{background:radial-gradient(ellipse,rgba(34,197,94,.12)0%,transparent 70%)}
-  .car-stage .glow.locked{background:radial-gradient(ellipse,rgba(239,68,68,.08)0%,transparent 70%)}
-  .car-stage .glow.climate{background:radial-gradient(ellipse,rgba(26,140,219,.15)0%,transparent 70%)}
-  .car-stage .glow.charging{background:radial-gradient(ellipse,rgba(26,140,219,.12)0%,transparent 60%)}
-
-  .car-svg-wrap{position:relative;width:300px;height:170px;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+  .car-stage{position:relative;height:190px;display:flex;align-items:center;justify-content:center;margin:0 -20px;overflow:hidden}
+  .car-stage .glow{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:240px;height:100px;border-radius:50%;background:radial-gradient(ellipse,rgba(22,120,255,.06)0%,transparent 70%);transition:all .6s ease}
+  .car-stage .glow.unlocked{background:radial-gradient(ellipse,rgba(48,209,88,.1)0%,transparent 70%)}
+  .car-stage .glow.locked{background:radial-gradient(ellipse,rgba(255,69,58,.06)0%,transparent 70%)}
+  .car-svg-wrap{position:relative;width:300px;height:165px}
   .car-svg-wrap.shake{animation:carShake .3s}
   @keyframes carShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
   .car-svg-wrap.frunk-open{transform:translateY(-4px)}
@@ -65,64 +58,39 @@
   .car-svg-wrap.honk{animation:carHonk .15s 3}
   @keyframes carHonk{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}
 
-  .car-part{transition:all .4s cubic-bezier(.4,0,.2,1)}
-  .car-part.hidden{opacity:0;pointer-events:none}
+  /* ── Lock Button ── */
+  .lock-section{padding:2px 0 6px}
+  .lock-btn{width:100%;padding:16px;border-radius:var(--radius);border:none;background:var(--card);border:1px solid var(--cardBorder);font-family:inherit;font-size:16px;font-weight:600;color:var(--onSurface);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;-webkit-tap-highlight-color:transparent}
+  .lock-btn.locked{background:var(--redDim);border-color:rgba(255,69,58,.2);color:var(--red)}
+  .lock-btn.unlocked{background:var(--greenDim);border-color:rgba(48,209,88,.2);color:var(--green)}
+  .lock-btn .icon{font-size:22px}
+  .lock-btn:active{transform:scale(.98)}
 
-  .door-lf{transform-origin:20px 58px;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-  .door-rf{transform-origin:40px 58px;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-  .door-lr{transform-origin:18px 60px;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-  .door-rr{transform-origin:38px 60px;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-  .door-open-lf{transform:rotate(-12deg)}
-  .door-open-rf{transform:rotate(12deg)}
-  .door-open-lr{transform:rotate(-10deg)}
-  .door-open-rr{transform:rotate(10deg)}
-
-  .frunk{transform-origin:80px 30px;transition:transform .4s cubic-bezier(.4,0,.2,1)}
-  .frunk-open .frunk{transform:rotateX(-40deg)translateY(-6px)}
-  .trunk{transform-origin:155px 28px;transition:transform .4s cubic-bezier(.4,0,.2,1)}
-  .trunk-open .trunk{transform:rotateX(-35deg)translateY(-5px)}
-
-  .headlight-on{opacity:0;transition:opacity .15s}
-  .lights-on .headlight-on{opacity:1}
-  .headlight-flash{opacity:0}
-  .lights-flash .headlight-flash{opacity:1;animation:flashBlink .1s 4}
-  @keyframes flashBlink{0%,100%{opacity:0}50%{opacity:1}}
-  .window-glass{transition:all .4s cubic-bezier(.4,0,.2,1)}
-  .windows-vent .window-glass{transform:translateY(4px);opacity:.6}
-  .charge-port{opacity:0;transition:opacity .3s}
-  .charging .charge-port{opacity:1}
-
-  .car-state-badge{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--onSurfaceDim);display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.06);z-index:2}
-  .car-state-badge .state-dot{width:5px;height:5px;border-radius:50%}
-
-  /* ── Range Strip ── */
-  .range-strip{display:flex;align-items:center;gap:16px;padding:6px 4px;justify-content:center}
-  .range-item{text-align:center}
-  .range-item .num{font-size:20px;font-weight:700;letter-spacing:-.5px}
-  .range-item .num.green{color:var(--green)}
-  .range-item .num.amber{color:var(--amber)}
-  .range-item .num.red{color:var(--red)}
-  .range-item .label{font-size:11px;font-weight:500;color:var(--onSurfaceMuted);margin-top:1px}
-  .range-divider{width:1px;height:28px;background:rgba(255,255,255,.08)}
-
-  /* ── Lock ── */
-  .lock-section{padding:4px 0 6px}
-  .lock-btn{width:100%;padding:18px;border-radius:var(--radius);border:none;background:var(--surface2);font-family:inherit;font-size:17px;font-weight:600;color:var(--onSurface);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
-  .lock-btn.locked{background:var(--redDim);color:var(--red)}
-  .lock-btn.unlocked{background:var(--greenDim);color:var(--green)}
-  .lock-btn.loading{opacity:.6;pointer-events:none}
-  .lock-btn .icon{font-size:24px;line-height:1}
-  .lock-btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.1);transform:scale(0);animation:rippleAnim .6s ease-out;pointer-events:none}
-  @keyframes rippleAnim{to{transform:scale(4);opacity:0}}
-
-  .section-label{font-size:13px;font-weight:600;color:var(--onSurface);padding:14px 4px 8px}
+  /* ── Quick Controls ── */
+  .section-label{font-size:15px;font-weight:700;padding:16px 0 10px}
   .quick-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
-  .qc{background:var(--surface2);border:1px solid rgba(255,255,255,.04);border-radius:var(--radiusSm);padding:12px 4px;text-align:center;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none}
+  .qc{background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radiusSm);padding:14px 4px 10px;text-align:center;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none}
   .qc:active{background:var(--surface3);transform:scale(.94)}
-  .qc .icon{font-size:20px;display:block;margin-bottom:3px}
-  .qc .label{font-size:10px;font-weight:500;color:var(--onSurfaceDim);letter-spacing:.2px}
+  .qc .icon{font-size:22px;display:block;margin-bottom:4px;line-height:1.2}
+  .qc .label{font-size:11px;font-weight:500;color:var(--onSurfaceDim);letter-spacing:.2px}
 
-  /* ── Vehicle List (dropdown) ── */
+  /* ── Vehicle List ── */
+  .dropdown-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:none;animation:fadeIn .2s}
+  .dropdown-overlay.show{display:block}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .dropdown-sheet{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom,16px)+16px);z-index:201;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:70vh;overflow-y:auto}
+  .dropdown-sheet.show{transform:translateY(0)}
+  .dropdown-sheet .handle{width:36px;height:4px;border-radius:2px;background:var(--surface3);margin:0 auto 16px}
+  .dropdown-sheet .title{font-size:16px;font-weight:700;margin-bottom:12px}
+  .dropdown-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--radiusSm);cursor:pointer;margin-bottom:4px}
+  .dropdown-item:active{background:var(--surface2)}
+  .dropdown-item.active{background:var(--accentDim);border:1px solid rgba(22,120,255,.15)}
+  .dropdown-item .di-icon{font-size:28px;width:40px;text-align:center}
+  .dropdown-item .di-info{flex:1}
+  .dropdown-item .di-name{font-size:14px;font-weight:600}
+  .dropdown-item .di-sub{font-size:11px;color:var(--onSurfaceDim);margin-top:2px}
+  .dropdown-item .di-check{color:var(--accent);font-size:14px;font-weight:700}
+
   .v-item{margin-bottom:4px}
   .v-item .v-info{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radiusSm);cursor:pointer}
   .v-item .v-info:active{background:var(--surface2)}
@@ -133,25 +101,25 @@
   .v-item .v-del{opacity:0;transition:opacity .15s;font-size:16px;cursor:pointer;color:var(--onSurfaceMuted);padding:4px}
   .v-item:hover .v-del,.v-item .v-del.show{opacity:1}
 
-  /* ── Add Vehicle Form ── */
-  .add-form{background:var(--surface2);border-radius:var(--radius);padding:20px;margin-top:12px}
-  .add-form .af-title{font-size:15px;font-weight:700;margin-bottom:16px}
-  .add-form label{font-size:11px;font-weight:500;color:var(--onSurfaceDim);display:block;margin-bottom:4px;margin-top:12px}
+  /* ── Add Vehicle ── */
+  .add-form{background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radius);padding:20px;margin-top:12px}
+  .add-form .af-title{font-size:16px;font-weight:700;margin-bottom:16px}
+  .add-form label{font-size:11px;font-weight:600;color:var(--onSurfaceDim);display:block;margin-bottom:4px;margin-top:12px;text-transform:uppercase;letter-spacing:.3px}
   .add-form label:first-of-type{margin-top:0}
-  .add-form input,.add-form select{width:100%;background:var(--surface3);border:1px solid rgba(255,255,255,.06);border-radius:var(--radiusXs);padding:12px 14px;color:var(--onSurface);font-size:13px;outline:none;font-family:inherit}
+  .add-form input,.add-form select{width:100%;background:var(--surface3);border:1px solid var(--cardBorder);border-radius:var(--radiusXs);padding:12px 14px;color:var(--onSurface);font-size:13px;outline:none;font-family:inherit}
   .add-form input:focus{border-color:var(--accent)}
   .add-form .vin-row{display:flex;gap:8px}
   .add-form .vin-row input{flex:1;font-family:'SF Mono','Menlo',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase}
   .add-form .vin-row button{background:var(--accent);border:none;border-radius:var(--radiusXs);padding:0 16px;color:#fff;font-weight:600;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
   .add-form .vin-row button:active{opacity:.8}
   .add-form .add-tabs{display:flex;gap:6px;margin-bottom:12px}
-  .add-form .add-tab{flex:1;padding:8px;border:1px solid rgba(255,255,255,.06);border-radius:var(--radiusXs);background:var(--surface3);color:var(--onSurfaceDim);font-size:12px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .2s}
+  .add-form .add-tab{flex:1;padding:8px;border:1px solid var(--cardBorder);border-radius:var(--radiusXs);background:var(--surface3);color:var(--onSurfaceDim);font-size:12px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .2s}
   .add-form .add-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .add-form .add-tab:active{opacity:.8}
   .add-form .vin-result{padding:10px;border-radius:var(--radiusXs);font-size:12px;line-height:1.6;display:none;margin-top:8px}
   .add-form .vin-result.show{display:block}
-  .add-form .vin-result.success{background:var(--greenDim);border:1px solid rgba(34,197,94,.15)}
-  .add-form .vin-result.error{background:var(--redDim);border:1px solid rgba(239,68,68,.15)}
+  .add-form .vin-result.success{background:var(--greenDim);border:1px solid rgba(48,209,88,.15)}
+  .add-form .vin-result.error{background:var(--redDim);border:1px solid rgba(255,69,58,.15)}
   .add-form .color-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
   .add-form .color-chip{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .12s}
   .add-form .color-chip.active{border-color:var(--onSurface);transform:scale(1.1)}
@@ -162,44 +130,44 @@
   /* ── Settings ── */
   .settings-group{margin-top:8px}
   .settings-group label{font-size:11px;color:var(--onSurfaceMuted);display:block;margin-bottom:4px;margin-top:10px}
-  .settings-group input{width:100%;background:var(--surface2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radiusXs);padding:12px 14px;color:var(--onSurface);font-size:13px;outline:none;font-family:inherit;margin-bottom:4px}
+  .settings-group input{width:100%;background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radiusXs);padding:12px 14px;color:var(--onSurface);font-size:13px;outline:none;font-family:inherit;margin-bottom:4px}
   .settings-group input:focus{border-color:var(--accent)}
   .mode-selector{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
-  .mode-chip{padding:10px;border-radius:var(--radiusXs);background:var(--surface2);border:1px solid rgba(255,255,255,.04);text-align:center;font-size:11px;font-weight:500;color:var(--onSurfaceDim);cursor:pointer;transition:all .15s}
+  .mode-chip{padding:10px;border-radius:var(--radiusXs);background:var(--card);border:1px solid var(--cardBorder);text-align:center;font-size:11px;font-weight:500;color:var(--onSurfaceDim);cursor:pointer;transition:all .15s}
   .mode-chip.active{background:var(--accentDim);border-color:var(--accent);color:var(--accent)}
 
-  /* ── Diagnostics Dashboard ── */
+  /* ── Diagnostics ── */
   .diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
-  .diag-card{background:var(--surface2);border:1px solid rgba(255,255,255,.04);border-radius:var(--radiusSm);padding:14px;position:relative;overflow:hidden}
+  .diag-card{background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radiusSm);padding:14px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
   .diag-card .dc-row{display:flex;align-items:center;justify-content:space-between}
   .diag-card .dc-icon{font-size:18px;width:28px}
   .diag-card .dc-name{font-size:11px;font-weight:600;color:var(--onSurfaceDim)}
-  .diag-card .dc-indicator{width:10px;height:10px;border-radius:50%;transition:all .3s}
-  .diag-card .dc-indicator.ok{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.3)}
-  .diag-card .dc-indicator.warn{background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.3)}
-  .diag-card .dc-indicator.error{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.3)}
+  .diag-card .dc-indicator{width:8px;height:8px;border-radius:50%}
+  .diag-card .dc-indicator.ok{background:var(--green);box-shadow:0 0 6px rgba(48,209,88,.4)}
+  .diag-card .dc-indicator.warn{background:var(--amber);box-shadow:0 0 6px rgba(255,159,10,.4)}
+  .diag-card .dc-indicator.error{background:var(--red);box-shadow:0 0 6px rgba(255,69,58,.4)}
   .diag-card .dc-indicator.offline{background:var(--onSurfaceMuted)}
-  .diag-card .dc-status{font-size:10px;color:var(--onSurfaceMuted);margin-top:4px;padding-left:28px;word-break:break-all;line-height:1.4}
-  .diag-card .dc-pulse{position:absolute;width:10px;height:10px;border-radius:50%;top:14px;right:14px;animation:pulse 2s infinite}
-  .diag-card .dc-pulse.ok{background:var(--green)}
-  .diag-card .dc-pulse.warn{background:var(--amber)}
-  .diag-card .dc-pulse.error{background:var(--red)}
+  .diag-card .dc-status{font-size:10px;color:var(--onSurfaceMuted);margin-top:4px;padding-left:28px;line-height:1.4}
+  .diag-card .dc-pulse{position:absolute;width:8px;height:8px;border-radius:50%;top:14px;right:14px;animation:pulse 2s infinite}
+  .diag-card .dc-pulse.ok{background:var(--green)}.diag-card .dc-pulse.warn{background:var(--amber)}.diag-card .dc-pulse.error{background:var(--red)}
   @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
   .diag-card .dc-pulse.ok{color:var(--green)}.diag-card .dc-pulse.warn{color:var(--amber)}.diag-card .dc-pulse.error{color:var(--red)}
-
   .diag-summary{display:flex;gap:6px;justify-content:center;padding:8px 0 4px}
-  .diag-summary .ds-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:var(--onSurfaceMuted);padding:4px 10px;border-radius:20px;background:var(--surface2)}
+  .diag-summary .ds-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:var(--onSurfaceMuted);padding:4px 10px;border-radius:20px;background:var(--card);border:1px solid var(--cardBorder)}
   .diag-summary .ds-item .ds-dot{width:5px;height:5px;border-radius:50%}
   .diag-summary .ds-item .ds-dot.ok{background:var(--green)}
   .diag-summary .ds-item .ds-dot.warn{background:var(--amber)}
   .diag-summary .ds-item .ds-dot.error{background:var(--red)}
 
-  .bottom-dock{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:8px 16px calc(env(safe-area-inset-bottom,8px)+8px);background:rgba(0,0,0,.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);z-index:100}
+  /* ── Bottom Dock ── */
+  .bottom-dock{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:6px 20px calc(env(safe-area-inset-bottom,8px)+6px);background:rgba(0,0,0,.92);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid rgba(255,255,255,.06);z-index:100}
   .dock-grid{display:flex;justify-content:space-around;align-items:center}
-  .dock-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;cursor:pointer;border:none;background:none;color:var(--onSurfaceMuted);font-family:inherit;font-size:10px;font-weight:500;transition:color .15s}
-  .dock-item .icon{font-size:20px}
-  .dock-item.active{color:var(--onSurface)}
+  .dock-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 16px;cursor:pointer;border:none;background:none;color:var(--onSurfaceMuted);font-family:inherit;font-size:10px;font-weight:500;transition:color .15s;border-radius:var(--radiusXs)}
+  .dock-item .icon{font-size:22px;line-height:1.2}
+  .dock-item.active{color:var(--accent)}
+  .dock-item:active{background:var(--surface2)}
 
+  /* ── Panels ── */
   .panel{display:none;animation:fadeUp .25s ease}
   .panel.active{display:block}
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -211,22 +179,49 @@
 <body>
 
 <div class="app" id="app">
-  <div class="status-bar">
-    <span class="conn"><span class="conn-dot offline" id="connDot"></span><span id="connLabel">未连接</span></span>
-  </div>
 
-  <!-- Vehicle Switcher -->
-  <div class="vehicle-switcher">
-    <div class="vs-select" onclick="showVehiclePicker()">
-      <span class="vs-icon" id="vsIcon">🚗</span>
-      <span class="vs-name" id="vsName">Model S 85D</span>
-      <span class="vs-arrow">▼</span>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="tb-left" onclick="showVehiclePicker()">
+      <span class="tb-vehicle"><span id="vsName">Model S 85D</span><span class="arrow">▼</span></span>
     </div>
-    <div class="vs-add" onclick="showAddVehicle()">+</div>
+    <div class="tb-conn">
+      <span class="conn-dot offline" id="connDot"></span>
+      <span id="connLabel">未连接</span>
+    </div>
   </div>
 
   <!-- Controls Panel -->
   <div class="panel active" id="panel-controls">
+
+    <!-- Status Card -->
+    <div class="status-card" id="statusCard">
+      <div class="sc-top">
+        <div class="sc-battery">
+          <div class="batt-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/>
+              <circle cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="3" stroke-dasharray="125.6" stroke-dashoffset="31.4" id="battArc" stroke-linecap="round"/>
+            </svg>
+            <span class="pct" id="battPct">--</span>
+          </div>
+          <div class="batt-info">
+            <div><span class="range" id="rangeKm">--</span><span class="range-unit">km</span></div>
+            <span class="sub" id="battSub">续航里程</span>
+          </div>
+        </div>
+        <div class="sc-right">
+          <div><span class="temp" id="ambientTemp">--</span><span class="temp-unit">°C</span></div>
+          <span class="sub" id="gearDisplay">P</span>
+        </div>
+      </div>
+      <div class="sc-bottom">
+        <div class="sc-stat"><div class="val" id="statCharge">--</div><div class="lbl">充电口</div></div>
+        <div class="sc-stat"><div class="val" id="statDoor">--</div><div class="lbl">车门</div></div>
+        <div class="sc-stat"><div class="val" id="statWindow">--</div><div class="lbl">车窗</div></div>
+        <div class="sc-stat"><div class="val" id="statDrive">--</div><div class="lbl">挡位</div></div>
+      </div>
+    </div>
     <div class="car-stage" id="carStage">
       <div class="glow" id="carGlow"></div>
       <div class="car-svg-wrap" id="carWrap">
@@ -345,14 +340,6 @@
         </svg>
       </div><!-- /car-svg-wrap -->
       <div class="car-state-badge"><span class="state-dot" id="stateDot" style="background:var(--onSurfaceMuted)"></span><span id="stateLabel">就绪</span></div>
-    </div>
-
-    <div class="range-strip">
-      <div class="range-item"><div class="num green" id="batteryPct">--</div><div class="label">电量 %</div></div>
-      <div class="range-divider"></div>
-      <div class="range-item"><div class="num" id="rangeKm">--</div><div class="label">续航 km</div></div>
-      <div class="range-divider"></div>
-      <div class="range-item"><div class="num" id="vinShort">5YJ…</div><div class="label" id="vinYearLabel">2015</div></div>
     </div>
 
     <div class="lock-section">
@@ -635,10 +622,7 @@ function updateVehicleUI() {
   const v = activeVehicle();
   if (!v) return;
 
-  document.getElementById('vsIcon').textContent = v.icon || '🚗';
   document.getElementById('vsName').textContent = v.nick;
-  document.getElementById('vinShort').textContent = v.vin ? v.vin.slice(0,5)+'…' : '—';
-  document.getElementById('vinYearLabel').textContent = v.year || '—';
   document.getElementById('carModelDisplay')?.remove();
 }
 
@@ -1166,7 +1150,41 @@ async function pollStatus(){
   CAR.connected=true;
   dot.className=`conn-dot ${r.connected?'online':'offline'}`;
   label.textContent=r.connected?'已连接':'CAN离线';
-  if(r.battery_soc!=null){document.getElementById('batteryPct').textContent=r.battery_soc;const n=document.getElementById('batteryPct');n.className='num '+(r.battery_soc>50?'green':r.battery_soc>20?'amber':'red')}
+
+  // Update battery ring
+  if(r.battery_soc!=null){
+    const pct=r.battery_soc;
+    document.getElementById('battPct').textContent=pct;
+    const circ=document.getElementById('battArc');
+    const circumference=125.6;
+    const offset=circumference-(circumference*pct/100);
+    circ.setAttribute('stroke-dashoffset',offset);
+    circ.setAttribute('stroke',pct>50?'var(--green)':pct>20?'var(--amber)':'var(--red)');
+  }
+
+  // Update range
+  if(r.battery_soc!=null){
+    // Estimate range: 443km at 100%
+    const estKm=Math.round(443*r.battery_soc/100);
+    document.getElementById('rangeKm').textContent=estKm;
+  }
+
+  // Update gear
+  if(r.gear){
+    document.getElementById('gearDisplay').textContent=r.gear;
+  }
+
+  // Update temperature
+  if(r.ambient_temp_c!=null){
+    document.getElementById('ambientTemp').textContent=Math.round(r.ambient_temp_c);
+  }
+
+  // Quick stats
+  document.getElementById('statCharge').textContent=r.charge_port?.state==='LOCKED'?'充电中':r.charge_port?.state==='OPEN'?'开启':'关闭';
+  document.getElementById('statDoor').textContent=r.doors?.locked?'已锁':'解锁';
+  document.getElementById('statWindow').textContent=r.windows||'--';
+  document.getElementById('statDrive').textContent=r.drive_mode||'--';
+
   updateCarVisual();
 }
 
