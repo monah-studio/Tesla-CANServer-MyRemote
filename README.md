@@ -19,14 +19,245 @@
 
 ---
 
-**[English](#english) | [简体中文](#简体中文) | [日本語](#日本語) | [한국어](#한국어)**
+## 🚀 Quick Start
+
+### Hardware
+
+```
+Orange Pi 4 Pro          CANable 2.0              Tesla Model S (pre-2021)
+     │                        │                           │
+     ├── USB ───────────────► CAN_H/L ──── OBD pin 1/9 ──► Body CAN (125kbps)
+     ├── USB ── 4G modem (optional, auto-net)
+     └── 12V→5V ── OBD pin 16 (car power)
+```
+
+### One-Click Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/monah-studio/\
+Tesla-ModelS-CAN-Server-Remote/main/setup.sh | sudo bash
+```
+
+The script auto-detects your hardware, installs dependencies, pulls the latest server code, and lets you choose between **Tailscale** or **Cloudflare Tunnel** for remote access.
+
+### Manual Install
+
+```bash
+git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
+cd Tesla-ModelS-CAN-Server-Remote/app
+python3 -m venv venv && source venv/bin/activate
+pip install flask flask-cors python-can
+python server.py
+```
+
+---
+
+## 🌐 Network Options
+
+Choose how users access the server:
+
+| Method | User needs | Works with 3rd party VPN | Setup |
+|--------|-----------|:------------------------:|:-----:|
+| **Cloudflare Tunnel** 🥇 | Nothing — just open browser | ✅ Yes | `setup.sh` → option 1 |
+| **Tailscale** | Install Tailscale app | ❌ No | `setup.sh` → option 2 |
+| LAN only | Same WiFi | ✅ Yes | No tunnel needed |
+
+### Cloudflare Tunnel (recommended)
+
+```
+User phone (any network, any VPN)     Cloudflare Edge           Orange Pi (4G)
+         │                                  │                       │
+         │  tesla-xxx.yourdomain.com        │  cloudflared tunnel   │
+         ├─────────────────────────────────►│◄──────────────────────┤
+         │◄───────── JSON response ─────────┤                       │
+```
+
+No open ports, no public IP, no VPN needed. The Orange Pi makes a single outbound HTTPS connection.
+
+### Tailscale
+
+```
+User phone (Tailscale app)          Tailscale P2P VPN        Orange Pi (Tailscale)
+         │                                  │                       │
+         │◄─────── WireGuard tunnel ────────►                       │
+```
+
+Simple, but users must install Tailscale and it conflicts with other VPNs.
+
+---
+
+## 🎮 API Reference
+
+### Controls (16 commands)
+
+| Method | Endpoint | Description | CAN ID |
+|--------|----------|-------------|:------:|
+| `POST` | `/api/lock` | 🔒 Lock all doors | `0x216` |
+| `POST` | `/api/unlock` | 🔓 Unlock all doors | `0x216` |
+| `POST` | `/api/frunk` | 🚘 Open front trunk | `0x217` |
+| `POST` | `/api/trunk` | 🚙 Open rear trunk | `0x218` |
+| `POST` | `/api/flash_lights` | 💡 Flash exterior lights | `0x244` |
+| `POST` | `/api/honk` | 📯 Honk horn | `0x245` |
+| `POST` | `/api/windows_vent` | 🪟 Vent windows | `0x215` |
+| `POST` | `/api/windows_close` | 🪟 Close windows | `0x215` |
+| `POST` | `/api/charge_port_open` | 🔌 Open charge port | `0x312` |
+| `POST` | `/api/charge_port_close` | 🔌 Close charge port | `0x312` |
+| `POST` | `/api/mirrors_fold` | 🪞 Fold side mirrors | `0x210` |
+| `POST` | `/api/mirrors_unfold` | 🪞 Unfold side mirrors | `0x210` |
+| `POST` | `/api/interior_lights_on` | 🔦 Interior lights on | `0x240` |
+| `POST` | `/api/interior_lights_off` | 🔦 Interior lights off | `0x240` |
+| `POST` | `/api/hvac_on` | ❄️ HVAC on | `0x302` |
+| `POST` | `/api/hvac_off` | ❄️ HVAC off | `0x302` |
+
+### Status & Data
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/ping` | Health check |
+| `GET` | `/api/status` | Full vehicle status (see below) |
+| `GET` | `/api/diagnostics` | System diagnostics (CAN, 4G, BT, Internet, Tailscale) |
+| `POST` | `/api/decode-vin` | Decode VIN → model, year, battery, range |
+| `GET` | `/api/models` | All 39 Tesla models in database |
+| `GET` | `/api/config/all` | Colors, wheels, MCU, interior, body options |
+
+### `GET /api/status` Response
+
+```json
+{
+  "connected": true,
+  "battery_soc": 75,
+  "gear": "P",
+  "speed_kmh": 0,
+  "drive_mode": "POWER_SAVE",
+  "charge_port": {
+    "state": "CLOSED",
+    "charging": false
+  },
+  "doors": {
+    "driver": "CLOSED",
+    "passenger": "CLOSED",
+    "rear_left": "CLOSED",
+    "rear_right": "CLOSED",
+    "locked": true
+  },
+  "windows": "CLOSED",
+  "ambient_temp_c": 25
+}
+```
+
+### CAN IDs
+
+| ID | Function | Notes |
+|:--:|----------|-------|
+| `0x216` | Door lock/unlock | Body CAN — all pre-2021 Model S |
+| `0x217` | Front trunk | |
+| `0x218` | Rear trunk | |
+| `0x215` | Windows | |
+| `0x244` | Lights | Flash on/off |
+| `0x245` | Horn | |
+| `0x312` | Charge port | Open/close + status |
+| `0x210` | Mirrors | Fold/unfold |
+| `0x240` | Interior lights | |
+| `0x302` | HVAC | |
+| `0x102` | Drive mode | Status read |
+| `0x202` | Battery SOC | Status read |
+| `0x212` | Speed | Status read |
+| `0x222` | Gear | Status read |
+| `0x304` | Ambient temperature | Status read |
+
+> ⚠️ **CAN IDs may vary by firmware version.** If a command doesn't respond, use `candump can0` while pressing the physical button to discover your car's actual IDs.
+
+---
+
+## 🗄️ R2 Cloud Backup
+
+This project supports **Cloudflare R2** (S3-compatible) for backup and logging:
+
+```bash
+# Configure AWS CLI with R2 credentials
+aws configure set aws_access_key_id <R2_ACCESS_KEY>
+aws configure set aws_secret_access_key <R2_SECRET_KEY>
+
+# Upload logs
+aws s3 cp /var/log/tesla-control.log s3://tesla-can-bucket/logs/ --endpoint-url https://<ACCOUNT>.r2.cloudflarestorage.com
+```
+
+Use R2 for: CAN bus telemetry archives, configuration backups, firmware update distribution.
+
+---
+
+## 🛠 Development
+
+```bash
+# Clone
+git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
+cd Tesla-ModelS-CAN-Server-Remote
+
+# Setup dev environment
+python3 -m venv venv
+source venv/bin/activate
+pip install flask flask-cors python-can
+
+# Run locally (for testing without CAN hardware)
+python app/server.py
+
+# Or using Docker
+docker build -t tesla-can .
+docker run -p 5000:5000 tesla-can
+```
+
+### Project Structure
+
+```
+├── setup.sh               # One-click install
+├── wiring.md              # OBD pinout + CANable wiring
+├── ARCHITECTURE.md        # Multi-path network diagram
+├── app/
+│   ├── server.py          # Flask REST API (16 commands)
+│   ├── tesla_can.py       # CAN bus driver + status decoder
+│   ├── tesla_models.py    # 39 Tesla models + VIN decoder
+│   ├── static/            # PWA frontend
+│   └── tools/
+│       └── can_sniffer.py # CAN ID discovery
+└── network/
+    └── setup_4g_modem.sh  # 4G modem helper
+```
+
+---
+
+## 🩺 Diagnostics Panel
+
+The PWA frontend includes a 6-card diagnostics dashboard:
+
+| Card | What it checks |
+|------|---------------|
+| 🔌 CAN Bus | `can0` interface UP/DOWN + driver status |
+| 📡 4G/5G | Cellular interface + internet reachability |
+| 📶 Bluetooth | hci0 status + BD address |
+| 🔗 Tailscale | `100.x.x.x` IP address |
+| 🖥️ Orange Pi | HTTP 200 response |
+| 🌐 Internet | ping 8.8.8.8 |
+
+---
+
+## ⚠️ Known Pitfalls
+
+- **Orange Pi OS (A733) kernel lacks CAN** — Use CANable 2.0 USB CAN adapter
+- **Tailscale on Orange Pi OS crashes** — Fix: `--tun=userspace-networking`
+- **CAN bitrate is 125 kbps** (not 500k) — Tesla Body CAN
+- **OBD powers the Pi continuously** — Add a timer relay or voltage cutoff for 12V battery protection
+- **CAN IDs vary by MCU firmware** — Always sniff your own car first
+
+---
+
+## License
+
+MIT
 
 ---
 
 <a name="english"></a>
-## 🇺🇸 English
-
-### The Story
+## 🇺🇸 The Story
 
 I'm a Github-native open-source contributor with triple backgrounds: law, pure mathematics and full-stack engineering. Outside of coding and protocol reverse-engineering, I also work as an early-stage tech startup angel investor. I'm used to solving hardware and software ecosystem deadlocks with logical mathematical modeling, underlying network protocol analysis and legal compliance verification. I'm releasing this self-hosted Tesla vehicle control project not for showing off tech skills, but for a real, helpless user-side rescue against official service restrictions.
 
