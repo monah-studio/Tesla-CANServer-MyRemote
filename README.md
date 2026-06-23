@@ -109,6 +109,25 @@ bash network/setup_network.sh
 - [Tesla Vehicle Command SDK](https://github.com/teslamotors/vehicle-command) — For 2021+ models with BLE support
 - [Comma.ai OpenPilot](https://github.com/commaai/openpilot) — ADAS system
 
+## 🙏 Credits / 致谢
+
+This project would not exist without these open-source projects and communities:
+
+| Project | What it does |
+|---------|-------------|
+| [**Open Vehicles**](https://docs.openvehicles.com) | OVMS — the original open-source Tesla CAN bus project. Massive inspiration. |
+| [**CANable**](https://canable.io) | USB-to-CAN adapter firmware & hardware — the physical bridge to the car |
+| [**candleLight firmware**](https://github.com/candle-usb/candleLight_fw) | Open-source CAN firmware running on CANable |
+| [**python-can**](https://github.com/hardbyte/python-can) | Python CAN library |
+| [**Flask**](https://flask.palletsprojects.com) | Web framework for the REST API server |
+| [**Tailscale**](https://tailscale.com) | Zero-config VPN — secure remote access to the car |
+| [**Orange Pi 4 Pro**](http://www.orangepi.org) | The SBC running the server (Raspberry Pi alternative) |
+| [**Tesla Vehicle Command SDK**](https://github.com/teslamotors/vehicle-command) | Tesla's official BLE/cloud API for 2021+ models |
+| [**Comma.ai OpenPilot**](https://github.com/commaai/openpilot) | ADAS system — pushing the boundaries of what's possible with cars |
+| [**OpenGarages**](https://opengarages.org) | Community of hackers reverse-engineering vehicle protocols |
+
+**Special thanks** to the reverse-engineering community on [Tesla Motors Club](https://teslamotorsclub.com) and the CAN bus hacking forums — the collective knowledge that made this possible.
+
 ### License
 
 MIT — do whatever you want. Just don't sue me if your car does something unexpected. This is a side project, not a product.
