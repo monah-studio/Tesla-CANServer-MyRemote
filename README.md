@@ -88,7 +88,7 @@ With solid legal awareness, rigorous mathematical logic and underlying engineeri
 ```bash
 # 1. Flash Orange Pi 4 Pro with official Ubuntu 1.0.6 Jammy Server Linux image
 # 2. Clone this repo
-git clone https://github.com/Monah-Limited/Tesla-ModelS-CAN-Server-Remote.git
+git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
 cd Tesla-ModelS-CAN-Server-Remote
 
 # 3. Run one-click setup
@@ -205,7 +205,7 @@ MIT — do whatever you want. Just don't sue me if your car does something unexp
 ```bash
 # 1. 为 Orange Pi 4 Pro 刷入官方 Ubuntu 1.0.6 Jammy Server Linux 镜像
 # 2. 克隆仓库
-git clone https://github.com/Monah-Limited/Tesla-ModelS-CAN-Server-Remote.git
+git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
 cd Tesla-ModelS-CAN-Server-Remote
 
 # 3. 运行一键部署脚本
