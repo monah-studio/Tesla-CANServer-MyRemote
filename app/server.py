@@ -69,7 +69,7 @@ def status():
     return jsonify(can.get_status())
 
 # Convenience command handlers
-_COMMANDS = ["lock", "unlock", "frunk", "trunk", "flash_lights"]
+_COMMANDS = ["lock", "unlock", "frunk", "trunk", "flash_lights", "honk", "windows_vent", "windows_close"]
 
 for _cmd in _COMMANDS:
     def make_handler(name=_cmd):

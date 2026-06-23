@@ -32,6 +32,9 @@ CAN_BITRATE   = 125000  # Body CAN
 CAN_ID_DOOR_LOCK   = 0x216
 CAN_ID_FRONT_TRUNK = 0x217
 CAN_ID_REAR_TRUNK  = 0x218
+CAN_ID_LIGHTS      = 0x244
+CAN_ID_HORN        = 0x245
+CAN_ID_WINDOWS     = 0x215
 
 # ── Command Payloads ──────────────────────────────────────────────────
 # These are the most common bytes for Model S Body CAN.
@@ -164,3 +167,15 @@ class TeslaCANDriver:
         time.sleep(0.3)
         ok2 = self._send(CAN_ID_LIGHTS, CMD_LIGHTS_OFF)
         return {"success": ok1 and ok2, "command": "flash"}
+
+    def honk(self) -> dict:
+        ok = self._send(CAN_ID_HORN, CMD_HORN)
+        return {"success": ok, "command": "honk"}
+
+    def windows_vent(self) -> dict:
+        ok = self._send(CAN_ID_WINDOWS, CMD_WINDOW_VENT)
+        return {"success": ok, "command": "windows_vent"}
+
+    def windows_close(self) -> dict:
+        ok = self._send(CAN_ID_WINDOWS, CMD_WINDOW_CLOSE)
+        return {"success": ok, "command": "windows_close"}
