@@ -303,7 +303,7 @@ tesla-local-control/
 
 ## 👤 About the Author
 
-**Tim**
+Tim 是一位拥有法律学位、精算学位、自学编程，热衷于 Vibe Coding 和 AI 的人。
 
 This repo is a conversation starter, not a product pitch. PRs welcome. Issues welcome. Ideas welcome. Let's build together.
 
