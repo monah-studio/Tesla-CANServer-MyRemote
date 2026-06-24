@@ -88,6 +88,8 @@ Download the official image and flash to a microSD card (16GB+):
 3. After flashing, insert SD card into Orange Pi and power on
 4. Find the Pi IP: check your router DHCP list, or scan with `arp -a`
 
+> 📦 **Pre-flashed image** — A ready-to-boot SD card image with everything pre-installed will be available for download once the project nears completion. Stay tuned.
+
 ### 2. One-Click Install
 
 ```bash
