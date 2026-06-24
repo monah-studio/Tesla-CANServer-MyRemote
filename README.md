@@ -21,7 +21,21 @@
 > 📅 Estimated completion: ~3 months. Hardware BOM and wiring guide coming soon.
 
 <p align="center">
-  <img src="assets/app_preview_01.png" alt="App Preview" width="600">
+  <table>
+    <tr>
+      <td width="33%" align="center"><img src="assets/app_preview_01.png" alt="App Preview 1" width="290"></td>
+      <td width="33%" align="center"><img src="assets/app_preview_02.png" alt="App Preview 2" width="290"></td>
+      <td width="33%" align="center"><img src="assets/app_preview_03.png" alt="App Preview 3" width="290"></td>
+    </tr>
+    <tr>
+      <td width="33%" align="center"><img src="assets/app_preview_04.png" alt="App Preview 4" width="290"></td>
+      <td width="33%" align="center"><img src="assets/app_preview_05.png" alt="App Preview 5" width="290"></td>
+      <td width="33%" align="center"><img src="assets/app_preview_06.png" alt="App Preview 6" width="290"></td>
+    </tr>
+    <tr>
+      <td colspan="3" align="center"><img src="assets/app_preview_07.png" alt="App Preview 7" width="290"></td>
+    </tr>
+  </table>
 </p>
 
 > **[ English ](#english)** · **[ 简体中文 ](#简体中文)** · **[ 日本語 ](#日本語)** · **[ 한국어 ](#한국어)**
