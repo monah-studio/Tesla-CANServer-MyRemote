@@ -367,7 +367,7 @@ No setup needed. Orange Pi broadcasts a BLE beacon (`TeslaControl-` prefix) cont
 | 33 | Model Y Long Range AWD | 2020–2025 | 75–82kWh | 533 | `5YJY`, `LRWY` |
 | 34 | Model Y Performance | 2020–2025 | 75–82kWh | 488 | `5YJY`, `LRWY` |
 
-> ⭐ **Your car**: Model S 85D (2015) — currently used as primary test vehicle and CAN ID development target.
+> ⭐ **Test vehicles**: Model S 85D (2015), Model S P85D (2016), Model X P90D (2017), Model 3 (2022), Model Y (2025)
 
 ### `GET /api/status` Example
 
@@ -1070,7 +1070,7 @@ python server.py
 | 33 | Model Y Long Range AWD | 2020–2025 | 75–82kWh | 533 | `5YJY`, `LRWY` |
 | 34 | Model Y Performance | 2020–2025 | 75–82kWh | 488 | `5YJY`, `LRWY` |
 
-> ⭐ **你的车**：Model S 85D (2015) — 当前使用的测试车和 CAN ID 开发目标。
+> ⭐ **测试车辆**：Model S 85D (2015)、Model S P85D (2016)、Model X P90D (2017)、Model 3 (2022)、Model Y (2025)
 
 ---
 
