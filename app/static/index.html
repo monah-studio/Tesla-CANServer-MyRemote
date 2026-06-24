@@ -26,6 +26,8 @@
   --red:#ff453a;
   --redDim:rgba(255,69,58,.12);
   --amber:#ff9f0a;
+  --carBody:#444;
+  --carBodyDark:#2a2a2a;
   --radius:16px;
   --radiusSm:12px;
   --radiusXs:8px;
@@ -65,6 +67,19 @@ body{font-family:-apple-system,'Inter','PingFang HK','Helvetica Neue',sans-serif
 .car-wrap.hop{animation:hop .12s 3}
 @keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 .car-hero .car-model{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:500;color:var(--onSurfaceMuted);background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:3px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.04)}
+
+.car-wrap .dr-seams{transition:opacity .3s}
+.car-wrap.unlocked .dr-seams{opacity:1 !important}
+.car-wrap .state-frunk path,.car-wrap .state-frunk line,.car-wrap .state-trunk path,.car-wrap .state-trunk line{transition:opacity .3s}
+.car-wrap.frunk .state-frunk path,.car-wrap.frunk .state-frunk line{opacity:1 !important}
+.car-wrap.trunk .state-trunk path,.car-wrap.trunk .state-trunk line{opacity:1 !important}
+.car-wrap .state-lights{transition:opacity .15s}
+.car-wrap.lights .state-lights{opacity:1 !important}
+.car-wrap .state-flash{transition:opacity .08s}
+.car-wrap.flash .state-flash{opacity:1 !important}
+.car-wrap .state-charge{transition:opacity .3s}
+.car-wrap.charge .state-charge{opacity:1 !important}
+.car-wrap:not(.connected){opacity:.5;transition:opacity .3s}
 
 /* ── Battery Card ── */
 .c-batt{background:var(--card);border:1px solid var(--cardBorder);border-radius:var(--radius);padding:16px;margin:2px 0 12px;display:flex;align-items:center;gap:14px}
@@ -244,7 +259,135 @@ body{font-family:-apple-system,'Inter','PingFang HK','Helvetica Neue',sans-serif
     <div class="car-hero">
       <div class="glow" id="cGlow"></div>
       <div class="car-wrap" id="cWrap">
-        <!-- SVG car from backend -->
+        <svg viewBox="0 0 320 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--carBody)"/>
+              <stop offset="100%" stop-color="var(--carBodyDark)"/>
+            </linearGradient>
+            <linearGradient id="glassGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(200,220,255,.08)"/>
+              <stop offset="50%" stop-color="rgba(200,220,255,.15)"/>
+              <stop offset="100%" stop-color="rgba(200,220,255,.04)"/>
+            </linearGradient>
+            <radialGradient id="lightBeam" cx="0" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(200,220,255,.2)"/>
+              <stop offset="100%" stop-color="rgba(200,220,255,0)"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Ground shadow -->
+          <ellipse cx="160" cy="158" rx="130" ry="5" fill="rgba(255,255,255,.02)"/>
+          <ellipse cx="160" cy="158" rx="80" ry="3" fill="rgba(255,255,255,.04)"/>
+
+          <!-- Body -->
+          <path d="M45 132 C18 128 10 112 10 98 C10 82 18 68 32 62 L38 58 C45 48 58 38 78 34 L108 30 L138 30 L168 34 C188 38 202 48 208 58 L214 62 C228 68 236 82 236 98 C236 112 228 128 202 132 L192 136 C184 140 172 144 155 145 L110 145 C70 144 56 140 48 136 L45 132Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+          <!-- Body highlight (upper line) -->
+          <path d="M48 128 C22 126 14 110 14 98 C14 84 22 70 34 64 L40 60 C46 52 58 42 74 38 L52 62 C40 68 34 80 34 98 C34 112 40 124 48 128Z" fill="rgba(255,255,255,.04)"/>
+
+          <!-- Sun reflection on body -->
+          <path d="M90 38 L140 34 L140 54 C120 56 102 62 90 72 L90 38Z" fill="rgba(255,255,255,.015)"/>
+
+          <!-- Windshield -->
+          <path d="M60 58 C66 44 80 34 100 30 L110 30 L110 52 C92 54 76 60 64 70 L60 58Z" fill="url(#glassGrad)" opacity=".5"/>
+          <!-- Windshield reflection -->
+          <path d="M68 44 C74 38 86 33 100 31 L100 36 C88 37 76 42 70 47 L68 44Z" fill="rgba(255,255,255,.08)"/>
+
+          <!-- Rear window -->
+          <path d="M182 48 C172 38 158 32 142 30 L142 52 C156 52 170 58 180 66 L182 48Z" fill="url(#glassGrad)" opacity=".4"/>
+          <path d="M150 36 L165 38 L160 48 L148 46Z" fill="rgba(255,255,255,.05)"/>
+
+          <!-- Door seams (visible on unlock) -->
+          <g class="dr-seams" opacity="0">
+            <line x1="118" y1="32" x2="118" y2="104" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>
+            <line x1="151" y1="32" x2="151" y2="104" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>
+            <line x1="185" y1="34" x2="185" y2="104" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>
+          </g>
+
+          <!-- Door panels -->
+          <path d="M64 36 L64 106 L115 106 L115 32" fill="rgba(255,255,255,.01)" stroke="rgba(255,255,255,.015)" stroke-width=".3"/>
+          <path d="M118 32 L118 106 L149 106 L149 32" fill="rgba(255,255,255,.01)" stroke="rgba(255,255,255,.015)" stroke-width=".3"/>
+          <path d="M152 32 L152 106 L183 106 L183 34" fill="rgba(255,255,255,.01)" stroke="rgba(255,255,255,.015)" stroke-width=".3"/>
+          <path d="M186 34 L186 106 L232 106 L232 36" fill="rgba(255,255,255,.01)" stroke="rgba(255,255,255,.015)" stroke-width=".3"/>
+
+          <!-- Door handles -->
+          <rect x="72" y="66" width="9" height="2" rx="1" fill="rgba(255,255,255,.04)"/>
+          <rect x="123" y="66" width="9" height="2" rx="1" fill="rgba(255,255,255,.04)"/>
+          <rect x="158" y="66" width="9" height="2" rx="1" fill="rgba(255,255,255,.04)"/>
+          <rect x="204" y="66" width="9" height="2" rx="1" fill="rgba(255,255,255,.04)"/>
+
+          <!-- Side camera (2021+ style) -->
+          <circle cx="178" cy="56" r="2.5" fill="rgba(20,20,25,.8)" stroke="rgba(255,255,255,.04)" stroke-width=".4"/>
+
+          <!-- Frunk (front hood) -->
+          <g class="state-frunk">
+            <!-- Frunk raised -->
+            <path d="M10 98 C10 76 22 56 42 50 L48 48 L48 74 C32 76 20 86 14 100 L10 98Z" fill="var(--carBodyDark)" stroke="rgba(255,255,255,.03)" stroke-width=".4" opacity="0"/>
+            <!-- Frunk gap -->
+            <path d="M48 60 C58 56 70 52 88 50 L88 38 C70 40 58 44 48 48 L48 60Z" fill="rgba(0,0,0,.2)" opacity="0"/>
+            <!-- Strut -->
+            <line x1="48" y1="62" x2="60" y2="50" stroke="rgba(255,255,255,.03)" stroke-width=".5" opacity="0"/>
+          </g>
+
+          <!-- Trunk (rear hatch) -->
+          <g class="state-trunk">
+            <path d="M236 98 C240 76 228 56 212 50 L206 48 L206 74 C222 76 232 86 238 100 L236 98Z" fill="var(--carBodyDark)" stroke="rgba(255,255,255,.03)" stroke-width=".4" opacity="0"/>
+            <path d="M206 60 C196 56 184 52 166 50 L166 38 C184 40 196 44 206 48 L206 60Z" fill="rgba(0,0,0,.2)" opacity="0"/>
+            <line x1="206" y1="62" x2="194" y2="50" stroke="rgba(255,255,255,.03)" stroke-width=".5" opacity="0"/>
+          </g>
+
+          <!-- Headlights -->
+          <ellipse cx="16" cy="96" rx="6" ry="3.5" fill="rgba(255,255,255,.1)"/>
+          <!-- DRL strip -->
+          <path d="M10 94 C12 92 16 91 20 92" stroke="rgba(200,220,255,.08)" stroke-width="1" fill="none" stroke-linecap="round"/>
+          <!-- Low beam glow -->
+          <ellipse class="state-lights" cx="0" cy="96" rx="28" ry="10" fill="url(#lightBeam)" opacity="0"/>
+          <!-- Flash -->
+          <ellipse class="state-flash" cx="8" cy="96" rx="16" ry="14" fill="rgba(255,255,255,.4)" opacity="0" filter="url(#glow)"/>
+
+          <!-- Tail lights -->
+          <ellipse cx="234" cy="98" rx="3.5" ry="3" fill="rgba(200,50,0,.12)"/>
+          <!-- Taillight strip -->
+          <path d="M236 96 C238 95 240 95 242 96" stroke="rgba(200,50,0,.08)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+          <!-- Charging port -->
+          <g class="state-charge" opacity="0">
+            <circle cx="172" cy="50" r="4" fill="rgba(68,144,255,.1)"/>
+            <circle cx="172" cy="50" r="2" fill="rgba(68,144,255,.15)"/>
+            <path d="M172 44 C172 32 178 24 188 22 C194 20 202 20 208 16" stroke="rgba(255,255,255,.06)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <rect x="204" y="12" width="6" height="5" rx=".8" fill="rgba(255,255,255,.03)"/>
+            <rect x="205" y="11" width="4" height="1.5" rx=".5" fill="var(--accent)"/>
+          </g>
+
+          <!-- Wheels (front) -->
+          <g>
+            <ellipse cx="95" cy="138" rx="22" ry="12" fill="#080808" stroke="rgba(255,255,255,.03)" stroke-width=".5"/>
+            <ellipse cx="95" cy="138" rx="14" ry="7.5" fill="#111"/>
+            <!-- Rim spokes -->
+            <line x1="95" y1="130" x2="95" y2="146" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="82" y1="134" x2="108" y2="142" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="108" y1="134" x2="82" y2="142" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="88" y1="131" x2="102" y2="145" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
+            <line x1="102" y1="131" x2="88" y2="145" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
+            <!-- Hub -->
+            <ellipse cx="95" cy="138" rx="3.5" ry="2" fill="rgba(255,255,255,.02)"/>
+          </g>
+          <!-- Wheels (rear) -->
+          <g>
+            <ellipse cx="210" cy="138" rx="22" ry="12" fill="#080808" stroke="rgba(255,255,255,.03)" stroke-width=".5"/>
+            <ellipse cx="210" cy="138" rx="14" ry="7.5" fill="#111"/>
+            <line x1="210" y1="130" x2="210" y2="146" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="197" y1="134" x2="223" y2="142" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="223" y1="134" x2="197" y2="142" stroke="rgba(255,255,255,.025)" stroke-width="1.2"/>
+            <line x1="203" y1="131" x2="217" y2="145" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
+            <line x1="217" y1="131" x2="203" y2="145" stroke="rgba(255,255,255,.02)" stroke-width="1"/>
+            <ellipse cx="210" cy="138" rx="3.5" ry="2" fill="rgba(255,255,255,.02)"/>
+          </g>
+        </svg>
       </div>
       <div class="car-model" id="cMod">2015 Model S 85D · 午夜银</div>
     </div>
@@ -505,10 +648,20 @@ function pickV(id){actV=id;localStorage.setItem('tsl_act',id);sv();hideVP();rend
 
 // ═══ CAR STATE ═══
 const CAR={locked:true,doors:false,frunk:false,trunk:false,windowsVent:false,connected:false,charging:false};
+
+function updCar(){
+  const w=document.getElementById('cWrap');
+  const g=document.getElementById('cGlow');
+  if(!w)return;
+  w.className='car-wrap'+(CAR.connected?' connected':'')+(CAR.doors||!CAR.locked?' unlocked':'')+(CAR.frunk?' frunk':'')+(CAR.trunk?' trunk':'')+(CAR.charging?' charge':'')+(CAR.flash?' flash':'');
+  g.className='glow'+(CAR.doors||!CAR.locked?' g-unlock':'')+(CAR.locked&&!CAR.doors?' g-lock':'');
+}
+
 function toLock(e){
   const c=CAR.locked?'unlock':'lock';const b=document.getElementById('lkBtn');const l=document.getElementById('lkLbl');
   if(c==='unlock'){CAR.locked=false;CAR.doors=true;b.className='lock-btn u';l.textContent='🔓 开门'}else{CAR.locked=true;CAR.doors=false;b.className='lock-btn l';l.textContent='🔒 锁门'}
-  api('POST',c).then(r=>{if(!r||!r.success){CAR.locked=!CAR.locked;updLK();toast('⚠️ 失败','')}});
+  updCar();
+  api('POST',c).then(r=>{if(!r||!r.success){CAR.locked=!CAR.locked;updLK();updCar();toast('⚠️ 失败','')}});
 }
 function updLK(){
   const b=document.getElementById('lkBtn'),l=document.getElementById('lkLbl');
@@ -522,7 +675,8 @@ function sCmd(c){
   else if(c==='windows_vent')CAR.windowsVent=true;
   else if(c==='windows_close')CAR.windowsVent=false;
   else if(c==='charge_port')CAR.charging=!CAR.charging;
-  updLK();const k={lock:'🔒锁门',unlock:'🔓开门',frunk:'🟢前备箱',trunk:'🟤后备箱',flash_lights:'💡闪灯',honk:'📯鸣笛',windows_vent:'🪟通风',windows_close:'🔒关窗',charge_port:'🔌充电口'}[c]||c;
+  else if(c==='flash_lights'){CAR.flash=true;setTimeout(()=>{CAR.flash=false;updCar()},500)}
+  updLK();updCar();const k={lock:'🔒锁门',unlock:'🔓开门',frunk:'🟢前备箱',trunk:'🟤后备箱',flash_lights:'💡闪灯',honk:'📯鸣笛',windows_vent:'🪟通风',windows_close:'🔒关窗',charge_port:'🔌充电口'}[c]||c;
   api('POST',c).then(r=>toast(r?.success?'✅ '+k:'⚠️ 失败',''));
 }
 
