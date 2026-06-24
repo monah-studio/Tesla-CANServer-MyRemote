@@ -132,18 +132,55 @@ Full wiring details → [`wiring.md`](./wiring.md) (MCP2515) or [CANable quickst
 
 ### Model 3 / Y Solutions
 
-Model 3/Y use a different architecture — an Ethernet gateway sits between the OBD port and the vehicle CAN buses. You cannot plug a CANable into OBD and talk to the car directly. However, there are **three proven approaches**:
+Model 3/Y use a different architecture — an **Ethernet gateway** sits between the OBD port and the vehicle CAN buses. You cannot plug a CANable into OBD and talk to the car directly. However, there are **four proven hardware/software approaches**:
 
-| Method | What it does | How | Hardware Needed | Works Offline? | Open Source? |
-|--------|-------------|-----|:---------------:|:--------------:|:------------:|
-| **🧩 OVMS Module** 🥇 | Full CAN control via add-on module | [Open Vehicles](https://docs.openvehicles.com) installs its own CAN transceiver by tapping into the vehicle CAN behind the gateway | OVMS v3/v4 module + SIM card | ✅ Yes — CAN bypass | ✅ MIT |
-| **📱 Tesla Vehicle Command SDK** | Official BLE-based control (lock, unlock, climate, etc.) | Phone pairs with car via BLE, sends signed commands over Tesla's proprietary protocol | None (phone only) | ✅ Yes — BLE direct | ✅ Apache 2.0 |
-| **☁️ Tesla Fleet API** | Cloud-based REST API | Server-side API calls via `https://fleet-api.prd.vn.cloud.tesla.com` | Internet connection | ❌ Needs cloud | ✅ |
+| Method | What it does | How | Hardware Needed | Works Offline? | Model 3/Y CAN Access |
+|--------|-------------|-----|:---------------:|:--------------:|:--------------------:|
+| **🥇 OVMS Module** | Full CAN control (lock, frunk, climate, charge, location) | [Open Vehicles](https://docs.openvehicles.com) installs its own CAN transceiver — taps into **Body CAN (BCAN) + Chassis CAN (CCAN)** behind the gateway | OVMS v3/v4 module ($159–$229) + cellular SIM or WiFi | ✅ Yes — direct CAN | ✅ Tap behind frunk |
+| **🥈 Direct CAN Tap (DIY)** | Read/write BCAN & CCAN via Orange Pi + CANable | Tap CAN_H/CAN_L wires directly from the Ethernet gateway harness or the diagnostic connector in the front trunk (frunk) area | CANable 2.0 + wire taps + OBD breakout | ✅ Yes — direct CAN | ✅ Requires wire tapping |
+| **🥉 Tesla BLE SDK** | Official protocol — lock, unlock, climate, trunk via phone | [Tesla Vehicle Command SDK](https://github.com/teslamotors/vehicle-command) — phone pairs with car via BLE, sends signed commands | Any phone with BLE (no extra HW) | ✅ Yes — BLE direct | ❌ No CAN access |
+| **☁️ Tesla Fleet API** | Cloud-based REST API (location, charge, climate, lock) | Server-side calls via `fleet-api.prd.vn.cloud.tesla.com` | Internet + Tesla account token | ❌ Needs cloud | ❌ No CAN access |
 
-**Recommendation for this project's architecture (self-hosted + offline):**
-- **OVMS is the closest equivalent** — a dedicated CAN module that speaks directly to the vehicle's CAN buses, accessible over WiFi/BLE/serial. Works without cloud.
-- The **Tesla Vehicle Command SDK** is also worth exploring for its low-latency BLE path, but requires pairing each phone with the car (no single board as relay).
-- If you already own a Model 3/Y and want to build something similar to this project, start with [OVMS](https://docs.openvehicles.com) or the [vehicle-command SDK](https://github.com/teslamotors/vehicle-command).
+#### Direct CAN Tap for Model 3/Y (Practical Guide)
+
+**Pre-2021 Model 3/Y** have CAN accessible via the OBD-II pins (different pinout from Model S/X):
+```
+OBD pin 1  = CCAN_H (Chassis CAN)
+OBD pin 3  = BCAN_H (Body CAN)
+OBD pin 9  = CCAN_L / BCAN_L (shared ground reference)
+OBD pin 12 = BCAN_L
+OBD pin 4  = GND
+```
+
+**2021+ Model 3/Y** have CAN behind the Ethernet gateway, but you can still tap into the **harness behind the front trunk (frunk) diagnostic connector**. The diagnostic connector (10-pin Molex) provides:
+
+| Pin | Signal | Notes |
+|:---:|--------|-------|
+| 1 | BCAN_H | Body CAN high |
+| 2 | BCAN_L | Body CAN low |
+| 3 | CCAN_H | Chassis CAN high (chassis domain) |
+| 4 | CCAN_L | Chassis CAN low |
+| 5–10 | Power, GND, Ethernet | Gateway signals |
+
+> ⚠️ **Model 3/Y CAN bus runs at 500 kbps** (not 125 kbps like Model S/X). You must set `CAN_BITRATE = 500000` in `tesla_can.py`.
+
+#### CAN IDs differ significantly
+
+Model 3/Y CAN IDs are completely different from Model S/X. The current `tesla_can.py` codebase would need its own CAN ID map for these vehicles. This is an **active development area** since both a 2022 Model 3 and 2025 Model Y are available for testing.
+
+```bash
+# Use the CAN sniffer to discover Model 3/Y CAN IDs
+python3 tools/can_sniffer.py --bitrate 500000
+```
+
+#### Recommendation
+
+For this project's self-hosted, offline-first architecture:
+- **OVMS** is the fastest path — proven hardware, active community, supports both pre-2021 and 2021+ Model 3/Y
+- **DIY CAN tap** is the closest equivalent to the Model S/X approach — same Orange Pi + CANable stack, just different wiring and bitrate
+- The **BLE SDK + Raspberry Pi** approach could work as a hybrid: Pi acts as BLE relay between phone and car, no CAN needed
+
+> 📌 **Note:** Both a 2022 Model 3 and 2025 Model Y are available as test vehicles. CAN ID reverse-engineering and wiring validation are ongoing.
 
 ### What about other years?
 
