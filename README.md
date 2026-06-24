@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/languages-4-orange" alt="lang-4">
   <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="build">
   <img src="https://img.shields.io/badge/PRs-welcome-8A2BE2" alt="prs">
-  <img src="https://img.shields.io/github/v/release/monah-studio/Tesla-ModelS-CAN-Server-Remote?include_prereleases&label=release" alt="release">
+  <img src="https://img.shields.io/github/v/release/monah-studio/Tesla-CANServer-MyRemote?include_prereleases&label=release" alt="release">
 </p>
 
 <p align="center">
@@ -97,7 +97,7 @@ curl -fsSL https://raw.githubusercontent.com/monah-studio/\
 Tesla-ModelS-CAN-Server-Remote/main/setup.sh | sudo bash
 ```
 
-Or download the [latest release](https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote/releases/latest) and run:
+Or download the [latest release](https://github.com/monah-studio/Tesla-CANServer-MyRemote/releases/latest) and run:
 
 ```bash
 sudo bash setup.sh
@@ -108,7 +108,7 @@ The script auto-detects your hardware, installs dependencies, pulls the latest s
 ### 3. Manual Install
 
 ```bash
-git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
+git clone https://github.com/monah-studio/Tesla-CANServer-MyRemote.git
 cd Tesla-ModelS-CAN-Server-Remote/app
 python3 -m venv venv && source venv/bin/activate
 pip install flask flask-cors python-can
@@ -433,7 +433,7 @@ Based on legal compliance boundaries, basic mathematical logic modeling, and adv
 ```bash
 # 1. Flash Orange Pi 4 Pro with official Ubuntu 1.0.6 Jammy Server Linux image
 # 2. Clone this repo
-git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
+git clone https://github.com/monah-studio/Tesla-CANServer-MyRemote.git
 cd Tesla-ModelS-CAN-Server-Remote
 
 # 3. Run one-click setup
@@ -563,7 +563,7 @@ Built with lots of ☕ and stubbornness in Hong Kong SAR.
 ```bash
 # 1. 为 Orange Pi 4 Pro 刷入官方 Ubuntu 1.0.6 Jammy Server Linux 镜像
 # 2. 克隆仓库
-git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
+git clone https://github.com/monah-studio/Tesla-CANServer-MyRemote.git
 cd Tesla-ModelS-CAN-Server-Remote
 
 # 3. 运行一键部署脚本

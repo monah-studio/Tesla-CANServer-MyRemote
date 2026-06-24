@@ -30,7 +30,7 @@ info() { echo -e "${BLUE}ℹ${NC} $1"; }
 header() { echo -e "\n${CYAN}${BOLD}═══ $1 ═══${NC}\n"; }
 
 # ── Config ──────────────────────────────────────────────────────────
-REPO_URL="https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git"
+REPO_URL="https://github.com/monah-studio/Tesla-CANServer-MyRemote.git"
 INSTALL_DIR="/opt/tesla-control"
 VENV_DIR="$INSTALL_DIR/venv"
 SERVICE_USER="${SUDO_USER:-root}"
