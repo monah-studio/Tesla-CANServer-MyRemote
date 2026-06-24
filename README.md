@@ -174,24 +174,27 @@ Phone (Tailscale)              Tailscale P2P              Orange Pi (Tailscale)
 
 ### ⚡ Control Commands (16)
 
-| Method | Endpoint | Description | CAN ID |
-|--------|----------|-------------|:------:|
-| `POST` | `/api/lock` | 🔒 Lock all doors | `0x216` |
-| `POST` | `/api/unlock` | 🔓 Unlock all doors | `0x216` |
-| `POST` | `/api/frunk` | 🚘 Open front trunk | `0x217` |
-| `POST` | `/api/trunk` | 🚙 Open rear trunk | `0x218` |
-| `POST` | `/api/flash_lights` | 💡 Flash exterior lights | `0x244` |
-| `POST` | `/api/honk` | 📯 Honk horn | `0x245` |
-| `POST` | `/api/windows_vent` | 🪟 Vent windows | `0x215` |
-| `POST` | `/api/windows_close` | 🪟 Close windows | `0x215` |
-| `POST` | `/api/charge_port_open` | 🔌 Open charge port | `0x312` |
-| `POST` | `/api/charge_port_close` | 🔌 Close charge port | `0x312` |
-| `POST` | `/api/mirrors_fold` | 🪞 Fold side mirrors | `0x210` |
-| `POST` | `/api/mirrors_unfold` | 🪞 Unfold side mirrors | `0x210` |
-| `POST` | `/api/interior_lights_on` | 🔦 Interior lights on | `0x240` |
-| `POST` | `/api/interior_lights_off` | 🔦 Interior lights off | `0x240` |
-| `POST` | `/api/hvac_on` | ❄️ HVAC on | `0x302` |
-| `POST` | `/api/hvac_off` | ❄️ HVAC off | `0x302` |
+| Method | Endpoint | Description | CAN ID | Status |
+|--------|----------|-------------|:------:|:------:|
+| `POST` | `/api/lock` | 🔒 Lock all doors | `0x216` | ✅ |
+| `POST` | `/api/unlock` | 🔓 Unlock all doors | `0x216` | ✅ |
+| `POST` | `/api/frunk` | 🚘 Open front trunk | `0x217` | ✅ |
+| `POST` | `/api/trunk` | 🚙 Open rear trunk | `0x218` | ✅ |
+| `POST` | `/api/flash_lights` | 💡 Flash exterior lights | `0x244` | ✅ |
+| `POST` | `/api/honk` | 📯 Honk horn | `0x245` | ✅ |
+| `POST` | `/api/windows_vent` | 🪟 Vent windows | `0x215` | ✅ |
+| `POST` | `/api/windows_close` | 🪟 Close windows | `0x215` | ✅ |
+| `POST` | `/api/charge_port_open` | 🔌 Open charge port | `0x312` | 🔜 Need verification |
+| `POST` | `/api/charge_port_close` | 🔌 Close charge port | `0x312` | 🔜 Need verification |
+| `POST` | `/api/mirrors_fold` | 🪞 Fold side mirrors | `0x210` | 🔜 Need verification |
+| `POST` | `/api/mirrors_unfold` | 🪞 Unfold side mirrors | `0x210` | 🔜 Need verification |
+| `POST` | `/api/interior_lights_on` | 🔦 Interior lights on | `0x240` | 🔜 Need verification |
+| `POST` | `/api/interior_lights_off` | 🔦 Interior lights off | `0x240` | 🔜 Need verification |
+| `POST` | `/api/hvac_on` | ❄️ HVAC on | `0x302` | 🔜 Need verification |
+| `POST` | `/api/hvac_off` | ❄️ HVAC off | `0x302` | 🔜 Need verification |
+
+> ✅ = Code implemented and deployed. CANable hardware required to test on vehicle.  
+> 🔜 = Code implemented, CAN IDs from community databases — vehicle testing pending.
 
 ### 📊 Status & Data
 

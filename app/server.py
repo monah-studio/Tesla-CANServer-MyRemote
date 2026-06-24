@@ -12,9 +12,9 @@ from functools import wraps
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-from tesla_can import TeslaCANDriver
-from tesla_models import TESLA_MODELS, TESLA_COLORS, decode_vin
-from tesla_models import WHEEL_SIZES, MCU_TYPES, INTERIOR_COLORS, BODY_STYLES
+from app.tesla_can import TeslaCANDriver
+from app.tesla_models import TESLA_MODELS, TESLA_COLORS, decode_vin
+from app.tesla_models import WHEEL_SIZES, MCU_TYPES, INTERIOR_COLORS, BODY_STYLES
 
 # ── Config from environment ──────────────────────────────────────────
 HOST      = os.environ.get("TESLA_HOST", "0.0.0.0")
@@ -168,7 +168,6 @@ def my_vehicles():
     })
 
 # ── Tesla Fleet API ─────────────────────────────────────────────────
-from tesla_fleet import get_client as get_tesla_fleet
 
 _fleet = None
 def get_fleet():
