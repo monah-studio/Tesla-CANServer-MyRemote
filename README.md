@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/languages-4-orange" alt="lang-4">
   <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="build">
   <img src="https://img.shields.io/badge/PRs-welcome-8A2BE2" alt="prs">
+  <img src="https://img.shields.io/github/v/release/monah-studio/Tesla-ModelS-CAN-Server-Remote?include_prereleases&label=release" alt="release">
 </p>
 
 <p align="center">
@@ -73,26 +74,36 @@
 
 ## 🚀 Quick Start
 
-### Hardware Wiring
+### 1. Flash Orange Pi OS to SD Card
 
-```
-Orange Pi 4 Pro          CANable 2.0              Tesla Model S (pre-2021)
-     │                        │                           │
-     ├── USB ───────────────► CAN_H/L ──── OBD pin 1/9 ──► Body CAN (125kbps)
-     ├── USB ── 4G modem (optional, auto-net)
-     └── 12V→5V ── OBD pin 16 (car power)
-```
+Download the official image and flash to a microSD card (16GB+):
 
-### One-Click Install
+| Download | Link |
+|----------|------|
+| 🍊 Orange Pi OS 1.0.6 Jammy Server | [orangepi.org/download](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-4-LTS.html) |
+| 🔧 Balena Etcher (flash tool) | [balena.io/etcher](https://www.balena.io/etcher) |
+
+1. Insert microSD into your computer
+2. Open Balena Etcher → select the `.img.xz` file → select SD card → **Flash!**
+3. After flashing, insert SD card into Orange Pi and power on
+4. Find the Pi IP: check your router DHCP list, or scan with `arp -a`
+
+### 2. One-Click Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/monah-studio/\
 Tesla-ModelS-CAN-Server-Remote/main/setup.sh | sudo bash
 ```
 
-Auto-detects hardware, installs dependencies, pulls latest server code, and configures remote access.
+Or download the [latest release](https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote/releases/latest) and run:
 
-### Manual Install
+```bash
+sudo bash setup.sh
+```
+
+The script auto-detects your hardware, installs dependencies, pulls the latest server code, and configures remote access.
+
+### 3. Manual Install
 
 ```bash
 git clone https://github.com/monah-studio/Tesla-ModelS-CAN-Server-Remote.git
