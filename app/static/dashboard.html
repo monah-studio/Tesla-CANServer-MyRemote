@@ -3,351 +3,340 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
-<title>Tesla Battery Analytics</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js"></script>
+<title>Battery Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f2f3f5;--card:#fff;--cardBorder:rgba(0,0,0,.06);--text:#1c1c1e;--textDim:#8e8e93;--accent:#007aff;--accentDim:rgba(0,122,255,.08);--green:#34c759;--greenDim:rgba(52,199,89,.1);--amber:#ff9f0a;--red:#ff453a;--radius:16px;--radiusSm:12px}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-.app{max-width:480px;margin:0 auto;padding:env(safe-area-inset-top)16px 100px}
-.top{padding:20px 0 16px}
-.top h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
-.top p{font-size:13px;color:var(--textDim);margin-top:2px}
+/* ── Material Design 3 / Android 重置 ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --md-bg:#fdfbff;
+  --md-surface:#fff;
+  --md-surface1:#f8f9fa;
+  --md-surface2:#f0f1f3;
+  --md-surface3:#e8e9ed;
+  --md-surface5:#d5d7dc;
+  --md-primary:#1f5a9e;
+  --md-onPrimary:#fff;
+  --md-primaryContainer:#d5e3ff;
+  --md-onPrimaryContainer:#001b3d;
+  --md-secondary:#545f71;
+  --md-onSecondary:#fff;
+  --md-tertiary:#6d5676;
+  --md-onTertiary:#fff;
+  --md-error:#ba1a1a;
+  --md-onBg:#1b1b1f;
+  --md-onSurface:#1b1b1f;
+  --md-onSurfaceVariant:#44474f;
+  --md-outline:#74777f;
+  --md-outlineVariant:#c4c6d0;
+  --md-shadow:rgba(0,0,0,.08);
+  --md-green:#2e7d32;
+  --md-greenBg:#e8f5e9;
+  --md-amber:#e65100;
+  --md-amberBg:#fff3e0;
+  --md-red:#c62828;
+  --md-redBg:#ffebee;
+  --md-radius:28px;
+  --md-radiusSm:16px;
+  --md-radiusXs:12px;
+}
+body{font-family:'Google Sans','Inter',-apple-system,sans-serif;background:var(--md-bg);color:var(--md-onSurface);-webkit-font-smoothing:antialiased}
+.app{max-width:480px;margin:0 auto;padding:env(safe-area-inset-top,12px)0 calc(env(safe-area-inset-bottom,16px)+80px);min-height:100vh;position:relative}
 
-/* Health Ring */
-.hero{display:flex;gap:16px;margin-bottom:16px}
-.hero-card{flex:1;background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.hero-card.hc-main{flex:1.5}
-.hc-title{font-size:11px;font-weight:600;color:var(--textDim);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
-.hc-value{font-size:38px;font-weight:800;letter-spacing:-1px}
-.hc-value .hc-unit{font-size:14px;font-weight:500;color:var(--textDim);letter-spacing:0;margin-left:2px}
-.hc-value.good{color:var(--green)}
-.hc-value.ok{color:var(--amber)}
-.hc-value.bad{color:var(--red)}
-.hc-sub{font-size:12px;color:var(--textDim);margin-top:2px}
-.ring-wrap{display:flex;justify-content:center;align-items:center;position:relative;height:120px}
-.ring-bg{fill:none;stroke:#e8e8ec;stroke-width:8}
-.ring-fill{fill:none;stroke:var(--green);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s}
-.ring-label{position:absolute;text-align:center}
-.ring-label .rl-v{font-size:28px;font-weight:800;letter-spacing:-1px}
-.ring-label .rl-l{font-size:9px;font-weight:500;color:var(--textDim)}
+/* ── Top App Bar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 24px 4px}
+.topbar .tb-left{display:flex;align-items:center;gap:12px}
+.topbar .tb-back{width:40px;height:40px;border-radius:50%;border:none;background:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--md-onSurface);transition:background .15s}
+.topbar .tb-back:active{background:var(--md-surface2)}
+.topbar .tb-title{font-size:22px;font-weight:500;letter-spacing:.3px}
+.topbar .tb-action{width:40px;height:40px;border-radius:50%;border:none;background:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--md-onSurfaceVariant);transition:background .15s}
+.topbar .tb-action:active{background:var(--md-surface2)}
 
-/* Cards */
-.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.card-title{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.card-title .ct-info{font-size:10px;font-weight:400;color:var(--textDim);margin-left:auto}
+/* ── Hero Card ── */
+.hero{margin:4px 16px 12px;background:linear-gradient(135deg,var(--md-primaryContainer),#e8f0fe);border-radius:var(--md-radius);padding:24px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(31,90,158,.04)}
+.hero .h-row{display:flex;align-items:flex-end;gap:16px}
+.hero .h-ring{position:relative;width:88px;height:88px;flex-shrink:0}
+.hero .h-ring svg{width:88px;height:88px;transform:rotate(-90deg)}
+.hero .h-ring .ring-bg{fill:none;stroke:rgba(31,90,158,.12);stroke-width:8}
+.hero .h-ring .ring-fill{fill:none;stroke:var(--md-primary);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s}
+.hero .h-ring .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hero .h-ring .ring-center .rc-v{font-size:22px;font-weight:600;color:var(--md-primary);line-height:1.1}
+.hero .h-ring .ring-center .rc-l{font-size:9px;font-weight:500;color:var(--md-primary);opacity:.7}
+.hero .h-info{flex:1}
+.hero .h-info .hi-label{font-size:12px;font-weight:500;color:var(--md-onPrimaryContainer);opacity:.7;text-transform:uppercase;letter-spacing:.5px}
+.hero .h-info .hi-value{font-size:40px;font-weight:600;letter-spacing:-1.5px;color:var(--md-onPrimaryContainer);line-height:1.1;margin:2px 0}
+.hero .h-info .hi-value .hi-unit{font-size:16px;font-weight:500;letter-spacing:0;opacity:.6}
+.hero .h-info .hi-sub{font-size:13px;color:var(--md-onPrimaryContainer);opacity:.7;margin-top:4px}
+.hero .h-row2{display:flex;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(31,90,158,.08)}
+.hero .h-row2 .hr2-item{flex:1}
+.hero .h-row2 .hr2-item .hr2-v{font-size:18px;font-weight:600;color:var(--md-onPrimaryContainer)}
+.hero .h-row2 .hr2-item .hr2-l{font-size:10px;font-weight:500;color:var(--md-onPrimaryContainer);opacity:.6;text-transform:uppercase;letter-spacing:.3px}
 
-/* Stats Grid */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.stat-card{background:var(--card);border-radius:var(--radiusSm);padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.stat-card .sc-icon{font-size:20px;margin-bottom:4px}
-.stat-card .sc-val{font-size:20px;font-weight:700;letter-spacing:-.3px}
-.stat-card .sc-lbl{font-size:10px;font-weight:500;color:var(--textDim);margin-top:1px}
-.stat-card .sc-chg{font-size:10px;font-weight:600;margin-top:2px}
-.stat-card .sc-chg.up{color:var(--green)}
-.stat-card .sc-chg.down{color:var(--red)}
+/* ── Section ── */
+.sec{padding:12px 24px 6px;display:flex;align-items:center;justify-content:space-between}
+.sec .sec-t{font-size:16px;font-weight:500;letter-spacing:.2px}
+.sec .sec-r{font-size:12px;color:var(--md-primary);font-weight:500;cursor:pointer}
 
-/* Chart placeholder */
-.chart-box{height:180px;display:flex;align-items:flex-end;justify-content:space-around;padding:8px 0}
-.chart-bar{width:14px;border-radius:4px 4px 0 0;transition:height .5s;position:relative;min-height:4px}
-.chart-bar .bar-lbl{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--textDim);white-space:nowrap}
+/* ── Card Row ── */
+.cr{display:flex;gap:12px;padding:0 16px;margin-bottom:4px;overflow-x:auto;scrollbar-width:none}
+.cr::-webkit-scrollbar{display:none}
+.cr .cr-card{min-width:110px;flex-shrink:0;background:var(--md-surface);border:1px solid var(--md-outlineVariant);border-radius:var(--md-radiusSm);padding:16px}
+.cr .cr-card .cr-icon{font-size:24px;margin-bottom:4px}
+.cr .cr-card .cr-v{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.cr .cr-card .cr-v .cr-u{font-size:12px;font-weight:400;color:var(--md-onSurfaceVariant)}
+.cr .cr-card .cr-l{font-size:11px;color:var(--md-onSurfaceVariant);margin-top:1px;font-weight:500}
+.cr .cr-card .cr-b{font-size:10px;font-weight:600;margin-top:4px;padding:2px 8px;border-radius:100px;display:inline-block}
+.cr .cr-card .cr-b.good{color:var(--md-green);background:var(--md-greenBg)}
+.cr .cr-card .cr-b.ok{color:var(--md-amber);background:var(--md-amberBg)}
+.cr .cr-card .cr-b.bad{color:var(--md-red);background:var(--md-redBg)}
 
-/* Timeline */
-.timeline{position:relative;padding-left:20px}
-.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--cardBorder);border-radius:1px}
-.tl-item{position:relative;padding:0 0 14px 12px}
-.tl-item::before{content:'';position:absolute;left:-13px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
-.tl-item .tl-date{font-size:10px;color:var(--textDim)}
-.tl-item .tl-title{font-size:13px;font-weight:600;margin:1px 0}
-.tl-item .tl-detail{font-size:11px;color:var(--textDim);line-height:1.4}
+/* ── Chart Card ── */
+.chart-card{background:var(--md-surface);border:1px solid var(--md-outlineVariant);border-radius:var(--md-radius);margin:0 16px 12px;padding:16px;overflow:hidden}
+.chart-card .cc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.chart-card .cc-top .cct-l{font-size:15px;font-weight:500}
+.chart-card .cc-top .cct-r{font-size:11px;color:var(--md-onSurfaceVariant);font-weight:500}
+.chart-card .chart-h{height:160px}
 
-/* Bottom Nav */
-.b-nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:rgba(255,255,255,.9);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid rgba(0,0,0,.05);display:flex;justify-content:space-around;padding:6px 0 calc(env(safe-area-inset-bottom,6px)+6px);z-index:100}
-.b-nav button{display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;padding:6px 20px;font-family:inherit;cursor:pointer;color:var(--textDim);font-size:10px;transition:color .12s}
-.b-nav button .bni{font-size:22px}
-.b-nav button.active{color:var(--accent);font-weight:600}
+/* ── Timeline ── */
+.tl{padding:0 16px}
+.tl-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--md-outlineVariant)}
+.tl-item:last-child{border:none}
+.tl-item .tli-dot{width:10px;height:10px;border-radius:50%;background:var(--md-primary);margin-top:4px;flex-shrink:0;border:2px solid var(--md-primaryContainer)}
+.tl-item .tli-info{flex:1}
+.tl-item .tli-info .tli-date{font-size:11px;color:var(--md-onSurfaceVariant);font-weight:500}
+.tl-item .tli-info .tli-title{font-size:14px;font-weight:500;margin:1px 0}
+.tl-item .tli-info .tli-sub{font-size:12px;color:var(--md-onSurfaceVariant)}
 
-/* Loading / Error states */
-.loading{text-align:center;padding:40px;color:var(--textDim);font-size:14px}
-.error{text-align:center;padding:20px;color:var(--red);font-size:13px}
+/* ── Bottom Nav (Material 3) ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--md-surface);display:flex;justify-content:space-around;align-items:center;padding:4px 0 calc(env(safe-area-inset-bottom,4px)+4px);z-index:100;border-top:1px solid var(--md-outlineVariant)}
+.bnav button{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;padding:6px 20px;font-family:inherit;cursor:pointer;color:var(--md-onSurfaceVariant);font-size:11px;font-weight:500;transition:color .12s;position:relative;min-width:64px}
+.bnav button .bn-icon{font-size:22px;line-height:1;margin-bottom:1px}
+.bnav button.active{color:var(--md-primary)}
+.bnav button.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:3px;border-radius:0 0 3px 3px;background:var(--md-primary)}
 
+/* ── Dark Mode ── */
 @media(prefers-color-scheme:dark){
-  :root{--bg:#000;--card:#141416;--cardBorder:rgba(255,255,255,.06);--text:#fff;--textDim:#8e8e93;--accent:#4490ff}
-  .b-nav{background:rgba(0,0,0,.92);border-top-color:rgba(255,255,255,.05)}
-  .ring-bg{stroke:#1c1c1e}
+  :root{
+    --md-bg:#1b1b1f;
+    --md-surface:#252529;
+    --md-surface1:#2b2b30;
+    --md-surface2:#303036;
+    --md-surface3:#3c3c42;
+    --md-surface5:#4d4d54;
+    --md-primary:#a8c7fa;
+    --md-onPrimary:#003258;
+    --md-primaryContainer:#0d4883;
+    --md-onPrimaryContainer:#d5e3ff;
+    --md-onBg:#e4e2e6;
+    --md-onSurface:#e4e2e6;
+    --md-onSurfaceVariant:#c4c6d0;
+    --md-outline:#8e9099;
+    --md-outlineVariant:#44474f;
+    --md-green:#81c784;
+    --md-greenBg:#1b3a1b;
+    --md-amber:#ffa726;
+    --md-amberBg:#3a2a0b;
+    --md-red:#ef5350;
+    --md-redBg:#3a1616;
+  }
+  .hero{background:linear-gradient(135deg,var(--md-primaryContainer),#1a2a40)}
+  .hero::after{background:rgba(168,199,250,.03)}
+  .hero .h-ring .ring-bg{stroke:rgba(168,199,250,.1)}
+  .hero .h-info .hi-value,.hero .h-info .hi-label,.hero .h-info .hi-sub,
+  .hero .h-ring .ring-center .rc-v,.hero .h-ring .ring-center .rc-l,
+  .hero .h-row2 .hr2-item .hr2-v,.hero .h-row2 .hr2-item .hr2-l{color:var(--md-onPrimaryContainer)}
+  .hero .h-row2{border-top-color:rgba(168,199,250,.08)}
 }
 </style>
 </head>
 <body>
-
 <div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
-const { useState, useEffect, useMemo } = React;
-const { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } = recharts;
+const { useState, useMemo, useEffect } = React;
 
-// ── Simulated CAN data for demo ──
-const generateHistory = (days = 90) => {
-  const data = [];
-  let soc = 78, soh = 92.4, temp = 22, range = 420;
-  const now = Date.now();
-  for (let i = days; i >= 0; i--) {
-    const d = new Date(now - i * 86400000);
-    const charge = Math.random() > 0.7;
-    soc = Math.min(100, Math.max(10, soc + (Math.random() - 0.5) * 8));
-    if (charge) soc = Math.min(100, soc + Math.random() * 30);
-    soh = Math.max(70, soh - Math.random() * 0.05);
-    temp = 20 + Math.sin(i / 10) * 5 + (Math.random() - 0.5) * 3;
-    range = 400 + (soc - 50) * 1.5 + (Math.random() - 0.5) * 10;
-    data.push({
-      date: d.toISOString().slice(0,10),
-      day: `D${i}`,
-      soc: Math.round(soc),
-      soh: soh.toFixed(1),
-      temp: Math.round(temp),
-      range: Math.round(range),
-      charge_energy: charge ? Math.round(Math.random() * 30 + 10) : 0,
-    });
+// ── Data ──
+const genData = (n=90) => {
+  const d=[];let soc=75,soh=93.2,t=22,r=420;
+  for(let i=n;i>=0;i--){
+    const c=Math.random()>.7;
+    soc=Math.min(100,Math.max(10,soc+(Math.random()-.5)*7));
+    if(c)soc=Math.min(100,soc+Math.random()*25);
+    soh=Math.max(70,soh-Math.random()*.04);
+    t=20+Math.sin(i/8)*5+(Math.random()-.5)*3;
+    r=380+(soc-50)*1.8+(Math.random()-.5)*15;
+    d.push({day:i,date:new Date(Date.now()-i*864e5).toLocaleDateString('zh-CN'),soc:Math.round(soc),soh:soh.toFixed(1),temp:Math.round(t),range:Math.round(r),energy:c?Math.round(Math.random()*25+5):0});
   }
-  return data;
+  return d;
 };
 
-// ── Components ──
+// ── Helpers ──
+const circ=2*Math.PI*38;
 
-function HealthRing({ value, max, label, color }) {
-  const r = 42, circ = 2 * Math.PI * r;
-  const offset = circ - (value / max) * circ;
-  return React.createElement('div', { className: 'ring-wrap' },
-    React.createElement('svg', { width: '100', height: '100', viewBox: '0 0 100 100' },
-      React.createElement('circle', { cx: 50, cy: 50, r, className: 'ring-bg', strokeWidth: 8 }),
-      React.createElement('circle', { cx: 50, cy: 50, r, className: 'ring-fill', stroke: color,
-        strokeDasharray: circ, strokeDashoffset: offset,
-        transform: 'rotate(-90 50 50)', style: { transition: 'stroke-dashoffset 1s' }
-      })
+function Ring({val,max,color}){
+  const off=circ-(val/max)*circ;
+  return React.createElement('div',{className:'h-ring'},
+    React.createElement('svg',{viewBox:'0 0 88 88'},
+      React.createElement('circle',{cx:44,cy:44,r:38,className:'ring-bg'}),
+      React.createElement('circle',{cx:44,cy:44,r:38,className:'ring-fill',stroke:color,strokeDasharray:circ,strokeDashoffset:off,transform:'rotate(-90 44 44)'})
     ),
-    React.createElement('div', { className: 'ring-label' },
-      React.createElement('div', { className: 'rl-v', style: { color } }, value),
-      React.createElement('div', { className: 'rl-l' }, label)
+    React.createElement('div',{className:'ring-center'},
+      React.createElement('span',{className:'rc-v'},val),
+      React.createElement('span',{className:'rc-l'},'SoH')
     )
   );
 }
 
-function HeroSection({ data }) {
-  const latest = data[data.length - 1];
-  const first = data[0];
-  const degPct = first && latest ? ((parseFloat(latest.soh) - parseFloat(first.soh)) / parseFloat(first.soh) * 100).toFixed(1) : 0;
-  const healthColor = parseFloat(latest?.soh) > 90 ? 'var(--green)' : parseFloat(latest?.soh) > 80 ? 'var(--amber)' : 'var(--red)';
-  return React.createElement('div', { className: 'hero' },
-    React.createElement('div', { className: 'hero-card hc-main' },
-      React.createElement('div', { className: 'hc-title' }, '电池健康度'),
-      React.createElement(HealthRing, { value: parseFloat(latest?.soh || 0), max: 100, label: 'SoH %', color: healthColor }),
-      React.createElement('div', { className: 'hc-sub', style: { textAlign: 'center', marginTop: 4 } },
-        '较上月 ', React.createElement('span', { style: { color: parseFloat(degPct) < 0 ? 'var(--red)' : 'var(--green)', fontWeight: 600 } },
-          parseFloat(degPct) < 0 ? `▼ ${Math.abs(parseFloat(degPct))}%` : `▲ ${degPct}%`
+// ── Simple Bar Chart ──
+function MiniChart({data,keyName,color,height=120}){
+  const max=Math.max(...data.map(d=>d[keyName]),1);
+  const w=Math.max(8,Math.min(12,200/data.length));
+  return React.createElement('div',{style:{display:'flex',alignItems:'flex-end',gap:2,height,width:'100%',padding:'8px 0'}},
+    data.slice(-30).map((d,i)=>
+      React.createElement('div',{key:i,style:{width,height:`${(d[keyName]/max)*100}%`,background:color,borderRadius:'4px 4px 0 0',minHeight:2,opacity:.7+(d[keyName]/max)*.3,transition:'height .4s'}})
+    )
+  );
+}
+
+// ── App ──
+function App(){
+  const [tab,setTab]=useState('overview');
+  const data=useMemo(()=>genData(90),[]);
+  const last=data[data.length-1];
+  const first=data[0];
+  const deg=first?((parseFloat(last.soh)-parseFloat(first.soh))/parseFloat(first.soh)*100).toFixed(2):0;
+  const hColor=parseFloat(last.soh)>90?'var(--md-primary)':parseFloat(last.soh)>80?'var(--md-amber)':'var(--md-red)';
+  const totals={charge:data.reduce((s,d)=>s+d.energy,0),sessions:data.filter(d=>d.energy>0).length,avgT:Math.round(data.reduce((s,d)=>s+d.temp,0)/data.length)};
+  const charges=data.filter(d=>d.energy>0).slice(-8).reverse();
+
+  const overview=React.createElement(React.Fragment,null,
+    React.createElement('div',{className:'hero'},
+      React.createElement('div',{className:'h-row'},
+        React.createElement(Ring,{val:last.soh,max:100,color:hColor}),
+        React.createElement('div',{className:'h-info'},
+          React.createElement('div',{className:'hi-label'},'Model S 85D · 2015'),
+          React.createElement('div',{className:'hi-value'},last.soc,React.createElement('span',{className:'hi-unit'},' %')),
+          React.createElement('div',{className:'hi-sub'},'续航 ',last.range,' km · 温度 ',last.temp,'°C')
         )
-      )
-    ),
-    React.createElement('div', { className: 'hero-card' },
-      React.createElement('div', { className: 'hc-title' }, '当前电量'),
-      React.createElement('div', { className: 'hc-value ' + (latest?.soc > 50 ? 'good' : latest?.soc > 20 ? 'ok' : 'bad') },
-        latest?.soc, React.createElement('span', { className: 'hc-unit' }, '%')
       ),
-      React.createElement('div', { className: 'hc-sub' }, `续航 ${latest?.range || '—'} km`),
-      React.createElement('div', { style: { marginTop: 12 } },
-        React.createElement('div', { className: 'hc-title' }, '总充电量'),
-        React.createElement('div', { className: 'hc-value', style: { fontSize: 24 } },
-          data.reduce((s, d) => s + d.charge_energy, 0),
-          React.createElement('span', { className: 'hc-unit' }, ' kWh')
+      React.createElement('div',{className:'h-row2'},
+        React.createElement('div',{className:'hr2-item'},
+          React.createElement('div',{className:'hr2-v'},totals.charge,' kWh'),
+          React.createElement('div',{className:'hr2-l'},'总充电')
+        ),
+        React.createElement('div',{className:'hr2-item'},
+          React.createElement('div',{className:'hr2-v'},`${Number(deg)>0?'+':''}${deg}%`),
+          React.createElement('div',{className:'hr2-l'},'衰减率/90天')
+        ),
+        React.createElement('div',{className:'hr2-item'},
+          React.createElement('div',{className:'hr2-v'},totals.sessions),
+          React.createElement('div',{className:'hr2-l'},'充电次数')
         )
       )
-    )
-  );
-}
+    ),
 
-function StatGrid({ data }) {
-  const latest = data[data.length - 1];
-  const totals = {
-    charge: data.reduce((s, d) => s + d.charge_energy, 0),
-    sessions: data.filter(d => d.charge_energy > 0).length,
-    avgTemp: Math.round(data.reduce((s, d) => s + d.temp, 0) / data.length),
-  };
-  const car = { vin: '5YJSB7…', model: 'Model S 85D', year: 2015, battery: '85 kWh', odo: '158,423 km' };
-  return React.createElement('div', { className: 'stat-grid' },
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '🔋'),
-      React.createElement('div', { className: 'sc-val' }, latest?.soc || '—', React.createElement('span', { style: { fontSize: 12, fontWeight: 400, color: 'var(--textDim)', marginLeft: 2 } }, '%')),
-      React.createElement('div', { className: 'sc-lbl' }, '电量')
+    // Quick Stats Row
+    React.createElement('div',{className:'cr'},
+      [{ic:'🔋',v:last.soc+'%',l:'电量',b:'good',bv:'建议 20-80%'},
+       {ic:'⚡',v:totals.charge+' kWh',l:'总充电',b:'good',bv:'90 天'},
+       {ic:'🔁',v:totals.sessions,l:'充电次数',b:'good',bv:'平均 '+Math.round(totals.charge/Math.max(1,totals.sessions))+' kWh/次'},
+       {ic:'🌡️',v:totals.avgT+'°C',l:'平均温度',b:'good',bv:'最佳 20-25°C'},
+      ].map((s,i)=>
+        React.createElement('div',{key:i,className:'cr-card'},
+          React.createElement('div',{className:'cr-icon'},s.ic),
+          React.createElement('div',{className:'cr-v'},s.v),
+          React.createElement('div',{className:'cr-l'},s.l),
+          React.createElement('div',{className:'cr-b '+s.b},s.bv)
+        )
+      ))
+    ,
+    // SoH Trend
+    React.createElement('div',{className:'chart-card'},
+      React.createElement('div',{className:'cc-top'},
+        React.createElement('span',{className:'cct-l'},'📉 健康度趋势'),
+        React.createElement('span',{className:'cct-r'},'90 天')
+      ),
+      React.createElement(MiniChart,{data,keyName:'soh',color:hColor})
     ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '⚡'),
-      React.createElement('div', { className: 'sc-val' }, totals.charge, React.createElement('span', { style: { fontSize: 12, fontWeight: 400, color: 'var(--textDim)', marginLeft: 2 } }, 'kWh')),
-      React.createElement('div', { className: 'sc-lbl' }, '总充电量')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '🔁'),
-      React.createElement('div', { className: 'sc-val' }, totals.sessions),
-      React.createElement('div', { className: 'sc-lbl' }, '充电次数')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '🌡️'),
-      React.createElement('div', { className: 'sc-val' }, totals.avgTemp, React.createElement('span', { style: { fontSize: 12, fontWeight: 400, color: 'var(--textDim)', marginLeft: 2 } }, '°C')),
-      React.createElement('div', { className: 'sc-lbl' }, '平均温度')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '📊'),
-      React.createElement('div', { className: 'sc-val' }, car.odo),
-      React.createElement('div', { className: 'sc-lbl' }, '总里程')
-    ),
-    React.createElement('div', { className: 'stat-card' },
-      React.createElement('div', { className: 'sc-icon' }, '🏎️'),
-      React.createElement('div', { className: 'sc-val', style: { fontSize: 16 } }, car.model),
-      React.createElement('div', { className: 'sc-lbl' }, `${car.year} · ${car.battery}`)
-    )
-  );
-}
-
-function SoHChart({ data }) {
-  return React.createElement('div', { className: 'card' },
-    React.createElement('div', { className: 'card-title' },
-      '📉 电池健康衰减趋势',
-      React.createElement('span', { className: 'ct-info' }, '90 天')
-    ),
-    React.createElement(ResponsiveContainer, { width: '100%', height: 200 },
-      React.createElement(AreaChart, { data: data.slice(-30) },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3', stroke: 'var(--cardBorder)' }),
-        React.createElement(XAxis, { dataKey: 'day', tick: { fontSize: 9, fill: 'var(--textDim)' }, interval: 6 }),
-        React.createElement(YAxis, { domain: [70, 100], tick: { fontSize: 9, fill: 'var(--textDim)' }, width: 35 }),
-        React.createElement(Tooltip, {
-          contentStyle: { background: 'var(--card)', border: '1px solid var(--cardBorder)', borderRadius: 8, fontSize: 12 },
-          labelStyle: { color: 'var(--textDim)' }
-        }),
-        React.createElement(Area, { type: 'monotone', dataKey: 'soh', stroke: 'var(--accent)', fill: 'var(--accentDim)', strokeWidth: 2, name: 'SoH %' })
-      )
-    )
-  );
-}
-
-function SocChart({ data }) {
-  return React.createElement('div', { className: 'card' },
-    React.createElement('div', { className: 'card-title' },
-      '🔋 电量变化',
-      React.createElement('span', { className: 'ct-info' }, '30 天')
-    ),
-    React.createElement(ResponsiveContainer, { width: '100%', height: 180 },
-      React.createElement(AreaChart, { data: data.slice(-30) },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3', stroke: 'var(--cardBorder)' }),
-        React.createElement(XAxis, { dataKey: 'day', tick: { fontSize: 9, fill: 'var(--textDim)' }, interval: 6 }),
-        React.createElement(YAxis, { domain: [0, 100], tick: { fontSize: 9, fill: 'var(--textDim)' }, width: 30 }),
-        React.createElement(Tooltip, {
-          contentStyle: { background: 'var(--card)', border: '1px solid var(--cardBorder)', borderRadius: 8, fontSize: 12 }
-        }),
-        React.createElement(Area, { type: 'monotone', dataKey: 'soc', stroke: 'var(--green)', fill: 'var(--greenDim)', strokeWidth: 2, name: 'SoC %' })
-      )
-    )
-  );
-}
-
-function ChargeHistory({ data }) {
-  const charges = data.filter(d => d.charge_energy > 0).slice(-10).reverse();
-  return React.createElement('div', { className: 'card' },
-    React.createElement('div', { className: 'card-title' },
-      '⚡ 充电记录',
-      React.createElement('span', { className: 'ct-info' }, '最近 10 次')
-    ),
-    React.createElement('div', { className: 'timeline' },
-      charges.map((d, i) =>
-        React.createElement('div', { key: i, className: 'tl-item' },
-          React.createElement('div', { className: 'tl-date' }, d.date),
-          React.createElement('div', { className: 'tl-title' }, `充入 ${d.charge_energy} kWh · 电量 ${d.soc}%`),
-          React.createElement('div', { className: 'tl-detail' }, `电池温度 ${d.temp}°C · 续航 ${d.range} km`)
+    // AI Insights
+    React.createElement('div',{className:'chart-card'},
+      React.createElement('div',{className:'cc-top'},
+        React.createElement('span',{className:'cct-l'},'🤖 智能建议'),
+        React.createElement('span',{className:'cct-r'},'基于 90 天数据')
+      ),
+      [{ic:'🌡️',t:'温度建议',d:'平均 '+totals.avgT+'°C，在最佳充电区间 20-25°C 内 ✅'},
+       {ic:'⚡',t:'充电策略',d:'平均电量 '+last.soc+'%，建议日常保持 20-80% ✅'},
+       {ic:'🔋',t:'电池衰减',d:'每 90 天 '+Math.abs(Number(deg)).toFixed(1)+'%，低于行业平均水平 ✅'},
+      ].map((s,i)=>
+        React.createElement('div',{key:i,style:{display:'flex',gap:12,padding:'10px 0',borderTop:i>0?'1px solid var(--md-outlineVariant)':'none'}},
+          React.createElement('span',{style:{fontSize:22}},s.ic),
+          React.createElement('div',{style:{flex:1}},
+            React.createElement('div',{style:{fontSize:13,fontWeight:500}},s.t),
+            React.createElement('div',{style:{fontSize:12,color:'var(--md-onSurfaceVariant)',marginTop:1}},s.d)
+          )
         )
       )
-    )
-  );
-}
-
-function TempImpact({ data }) {
-  return React.createElement('div', { className: 'card' },
-    React.createElement('div', { className: 'card-title' },
-      '🌡️ 温度对续航的影响',
-      React.createElement('span', { className: 'ct-info' }, '30 天')
     ),
-    React.createElement(ResponsiveContainer, { width: '100%', height: 180 },
-      React.createElement(LineChart, { data: data.slice(-30) },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3', stroke: 'var(--cardBorder)' }),
-        React.createElement(XAxis, { dataKey: 'day', tick: { fontSize: 9, fill: 'var(--textDim)' }, interval: 6 }),
-        React.createElement(YAxis, { yAxisId: 'temp', domain: [0, 45], tick: { fontSize: 9, fill: 'var(--textDim)' }, width: 30 }),
-        React.createElement(YAxis, { yAxisId: 'range', orientation: 'right', domain: [200, 500], tick: { fontSize: 9, fill: 'var(--textDim)' }, width: 35 }),
-        React.createElement(Tooltip, {
-          contentStyle: { background: 'var(--card)', border: '1px solid var(--cardBorder)', borderRadius: 8, fontSize: 12 }
-        }),
-        React.createElement(Line, { yAxisId: 'temp', type: 'monotone', dataKey: 'temp', stroke: 'var(--amber)', strokeWidth: 2, name: '温度 °C' }),
-        React.createElement(Line, { yAxisId: 'range', type: 'monotone', dataKey: 'range', stroke: 'var(--accent)', strokeWidth: 2, name: '续航 km' })
+  );
+
+  const charts=React.createElement(React.Fragment,null,
+    React.createElement('div',{className:'chart-card',style:{marginTop:12}},
+      React.createElement('div',{className:'cc-top'},
+        React.createElement('span',{className:'cct-l'},'🔋 电量变化'),
+        React.createElement('span',{className:'cct-r'},'30 天')
+      ),
+      React.createElement(MiniChart,{data,keyName:'soc',color:'var(--md-green)'})
+    ),
+    React.createElement('div',{className:'chart-card'},
+      React.createElement('div',{className:'cc-top'},
+        React.createElement('span',{className:'cct-l'},'🌡️ 温度 vs 续航'),
+        React.createElement('span',{className:'cct-r'},'30 天')
+      ),
+      React.createElement('div',{style:{display:'flex',gap:16}},
+        React.createElement('div',{style:{flex:1}},React.createElement(MiniChart,{data,keyName:'temp',color:'var(--md-amber)'})),
+        React.createElement('div',{style:{flex:1}},React.createElement(MiniChart,{data,keyName:'range',color:'var(--md-primary)'}))
+      ),
+      React.createElement('div',{style:{display:'flex',gap:16,fontSize:11,color:'var(--md-onSurfaceVariant)',textAlign:'center',marginTop:4}},
+        React.createElement('span',{style:{flex:1}},'温度 °C'),
+        React.createElement('span',{style:{flex:1}},'续航 km')
       )
-    )
-  );
-}
-
-function Insights({ data }) {
-  const tips = [
-    { icon: '🌡️', en: 'Best charging temp 20-25°C. Your avg: 22°C ✅', zh: '最佳充电温度 20-25°C，你的均值 22°C ✅' },
-    { icon: '⚡', en: 'Keep SoC between 20-80% daily. You average 65% ✅', zh: '日常电量建议保持 20-80%，你的均值 65% ✅' },
-    { icon: '🔋', en: 'Health degradation 2.3%/year — below average (3-5%) 🎉', zh: '电池衰减 2.3%/年，低于平均值 3-5% 🎉' },
-  ];
-  return React.createElement('div', { className: 'card' },
-    React.createElement('div', { className: 'card-title' },
-      '🤖 AI 建议',
-      React.createElement('span', { className: 'ct-info' }, '基于 90 天数据分析')
     ),
-    tips.map((t, i) =>
-      React.createElement('div', { key: i, style: { display: 'flex', gap: 10, padding: '8px 0', borderBottom: i < tips.length - 1 ? '1px solid var(--cardBorder)' : 'none' } },
-        React.createElement('span', { style: { fontSize: 20 } }, t.icon),
-        React.createElement('div', { style: { flex: 1, fontSize: 12, lineHeight: 1.5, color: 'var(--textDim)' } }, t.zh)
+  );
+
+  const history=React.createElement(React.Fragment,null,
+    React.createElement('div',{style:{padding:'12px 16px 0'}},
+      React.createElement('div',{style:{fontSize:16,fontWeight:500,letterSpacing:.2px}},'⚡ 充电记录'),
+      React.createElement('div',{className:'tl',style:{padding:0,marginTop:8}},
+        charges.map((d,i)=>
+          React.createElement('div',{key:i,className:'tl-item'},
+            React.createElement('div',{className:'tli-dot'}),
+            React.createElement('div',{className:'tli-info'},
+              React.createElement('div',{className:'tli-date'},d.date),
+              React.createElement('div',{className:'tli-title'},'充入 ',d.energy,' kWh · 电量 ',d.soc,'%'),
+              React.createElement('div',{className:'tli-sub'},'温度 ',d.temp,'°C · 续航 ',d.range,' km')
+            )
+          )
+        )
       )
-    )
+    ),
   );
-}
 
-// ── Main App ──
-function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const data = useMemo(() => generateHistory(90), []);
-
-  const tabs = {
-    dashboard: React.createElement(React.Fragment, null,
-      React.createElement(HeroSection, { data }),
-      React.createElement(StatGrid, { data }),
-      React.createElement(SoHChart, { data }),
-      React.createElement(Insights, { data })
+  return React.createElement('div',{className:'app'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('div',{className:'tb-left'},
+        React.createElement('button',{className:'tb-back',onClick:()=>window.location='/'},'←'),
+        React.createElement('span',{className:'tb-title'},'Battery'),
+      ),
+      React.createElement('button',{className:'tb-action'},'⋮')
     ),
-    charts: React.createElement(React.Fragment, null,
-      React.createElement(SocChart, { data }),
-      React.createElement(TempImpact, { data })
-    ),
-    history: React.createElement(React.Fragment, null,
-      React.createElement(ChargeHistory, { data })
-    )
-  };
-
-  return React.createElement('div', { className: 'app' },
-    React.createElement('div', { className: 'top' },
-      React.createElement('h1', null, '⚡ 电池分析'),
-      React.createElement('p', null, 'Model S 85D · 基于本地 CAN 数据')
-    ),
-    tabs[activeTab],
-    React.createElement('div', { className: 'b-nav' },
-      ['dashboard', 'charts', 'history'].map(tab =>
-        React.createElement('button', {
-          key: tab,
-          className: activeTab === tab ? 'active' : '',
-          onClick: () => setActiveTab(tab)
-        },
-          React.createElement('span', { className: 'bni' },
-            tab === 'dashboard' ? '🏠' : tab === 'charts' ? '📈' : '📋'
-          ),
-          tab === 'dashboard' ? '概览' : tab === 'charts' ? '图表' : '历史'
+    {overview,charts,history}[tab],
+    React.createElement('div',{className:'bnav'},
+      ['overview','charts','history'].map(t=>
+        React.createElement('button',{key:t,className:tab===t?'active':'',onClick:()=>setTab(t)},
+          React.createElement('span',{className:'bn-icon'},{overview:'🏠',charts:'📈',history:'📋'}[t]),
+          {overview:'概览',charts:'图表',history:'记录'}[t]
         )
       )
     )
