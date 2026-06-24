@@ -91,6 +91,55 @@
 
 ---
 
+## 🚗 Model Compatibility & Wiring Variants
+
+Which Tesla shares which CAN hardware? Not all cars are wired the same.
+
+### CAN Architecture by Model
+
+| Model | Years | CAN Bus Type | Bitrate | OBD Pinout | Hardware |
+|-------|:-----:|:------------:|:-------:|:-----------|:---------|
+| **Model S / X** (pre-2021) | 2012–2020 | Body CAN (BCAN) + Chassis CAN (CHCAN) | 125 kbps | BCAN_H=pin1, BCAN_L=pin9 | CANable 2.0 / MCP2515 |
+| **Model S / X** (Palladium) | 2021+ | Ethernet gateway — no direct CAN access | — | Not OBD-accessible | ❌ Not supported |
+| **Model 3 / Y** | 2017+ | Private CAN (behind ETH gateway) | — | Not OBD-accessible | ❌ Requires BLE/cloud SDK |
+| **Cybertruck** | 2024+ | Private CAN | — | Not OBD-accessible | ❌ Requires BLE/cloud SDK |
+
+> ⚠️ **This project is built for pre-2021 Model S/X (Body CAN via OBD-II).** Model 3/Y, Cybertruck, and 2021+ Model S/X use an Ethernet gateway that blocks direct CAN access. For those, see [Tesla Vehicle Command SDK](https://github.com/teslamotors/vehicle-command) (BLE-based).
+
+### Wiring Variants
+
+There are **two ways** to connect a CAN adapter to a pre-2021 Model S/X:
+
+| Variant | Adapter | Wiring | Notes |
+|---------|---------|--------|-------|
+| **A — CANable 2.0 (USB)** ✅ *Recommended* | CANable 2.0 (candleLight firmware) | CAN_H→OBD pin1, CAN_L→OBD pin9, GND→OBD pin4 | Plug-and-play USB. No GPIO needed. Auto-detected as `gs_usb` socketcan. |
+| **B — MCP2515 (SPI)** ⚠️ *Legacy* | MCP2515 CAN module + SN65HVD230 | MOSI→GPIO19, MISO→GPIO21, SCK→GPIO23, CS→GPIO24, INT→GPIO22, 3.3V/GND | Uses Orange Pi SPI pins. Requires kernel module. Preferred only if USB is unavailable. |
+
+**Both variants use the same OBD pinout:**
+
+```
+OBD-II port (facing forward):
+    ┌───────────────────────┐
+    │ 4  3  2  1            │
+    │ 9  8  7  6  5         │
+    └───────────────────────┘
+
+    pin 1 = BCAN_H (125 kbps)
+    pin 9 = BCAN_L (125 kbps)
+    pin 4 = Chassis GND
+```
+
+Full wiring details → [`wiring.md`](./wiring.md) (MCP2515) or [CANable quickstart](https://canable.io/getting-started.html).
+
+### What about other years?
+
+CAN IDs **vary by model year** even within pre-2021 Model S/X. The database in `app/tesla_can.py` covers the 2015 Model S 85D (⭐ your car). If yours is different:
+
+```bash
+# Run the CAN sniffer to find your car's IDs
+python3 tools/can_sniffer.py
+```
+
 ## 🚀 Quick Start
 
 ### 1. Flash Orange Pi OS to SD Card
