@@ -480,13 +480,17 @@ body{font-family:-apple-system,'Inter','PingFang HK','Helvetica Neue',sans-serif
       <div class="mc on" data-m="tailscale">🔗 Tailscale</div>
       <div class="mc" data-m="ddns">🌍 DDNS</div>
       <div class="mc" data-m="wifi">🏠 WiFi</div>
-      <div class="mc" data-m="ble">📶 蓝牙</div>
+      <div class="mc" data-m="ble">📶 蓝牙 <span style="font-size:8px;color:var(--textDim)">(扫描)</span></div>
+    </div>
+    <div style="margin:4px 0 8px;display:flex;gap:6px">
+      <button onclick="bleScan()" style="flex:1;padding:8px;border-radius:var(--radiusXs);border:1px solid var(--cardBorder);background:var(--surface2);color:var(--onSurface);font-size:11px;font-family:inherit;cursor:pointer">📶 扫描蓝牙</button>
     </div>
     <div class="sg">
-      <label>连接地址</label><input type="url" id="sUrl" placeholder="http://100.x.x.x:5000">
+      <label>连接地址 (通用)</label><input type="url" id="sUrl" placeholder="http://100.x.x.x:5000">
       <label>API Token</label><input type="password" id="sTok" placeholder="安全令牌（可选）">
-      <label>Tailscale IP</label><input type="text" id="sTS" placeholder="100.x.x.x">
-      <label>DDNS 域名</label><input type="text" id="sDDNS" placeholder="remote.openfrunk.com">
+      <label>🔗 Tailscale IP</label><input type="text" id="sTS" placeholder="100.x.x.x">
+      <label>🌍 DDNS 域名</label><input type="text" id="sDDNS" placeholder="remote.openfrunk.com">
+      <label>🏠 本地 WiFi IP</label><input type="text" id="sWiFi" placeholder="10.10.10.140">
     </div>
   </div>
 
@@ -685,14 +689,45 @@ function sCmd(c){
 function adjTemp(d){/* stub */}
 
 // ═══ NETWORK ═══
+
+/* ── BLE Discovery ── */
+async function bleScan(){
+  if(!navigator.bluetooth){toast('📶 此设备不支持 Web Bluetooth');return}
+  try{
+    toast('📶 正在扫描 TeslaControl...');
+    const d=await navigator.bluetooth.requestDevice({filters:[{namePrefix:'TeslaControl'}],optionalServices:[]});
+    // BLE gave us the device — user connected via GATT
+    // The Pi BLE beacon broadcasts its IP as the device name
+    const name=d.name||'';
+    const ipMatch=name.match(/(\d+\.\d+\.\d+\.\d+)/);
+    if(ipMatch){
+      localStorage.setItem('tsl_ble_ip',ipMatch[1]);
+      toast('✅ 蓝牙发现: '+ipMatch[1]);
+      document.querySelector('.mc.on')?.classList.remove('on');
+      document.querySelector('[data-m=\"ble\"]')?.classList.add('on');
+    }else{
+      toast('⚠️ 未能解析 IP，请在设置手动填写');
+    }
+  }catch(e){
+    if(e.name!='NotFoundError')toast('⚠️ 蓝牙扫描失败');
+  }
+}
+
 function getUrl(){
   const m=document.querySelector('.mc.on')?.dataset?.m||'tailscale';
-  const ips={tailscale:document.getElementById('sTS').value,wifi:'http://10.10.10.140:5000',ddns:document.getElementById('sDDNS').value};
-  return ips[m]||'http://10.10.10.140:5000';
+  localStorage.setItem('tsl_mode',m);
+  const ips={
+    tailscale: document.getElementById('sTS').value ? 'http://'+document.getElementById('sTS').value+':5000' : '',
+    wifi: document.getElementById('sWiFi').value ? 'http://'+document.getElementById('sWiFi').value+':5000' : '',
+    ddns: document.getElementById('sDDNS').value ? 'http://'+document.getElementById('sDDNS').value+':5000' : '',
+    ble: localStorage.getItem('tsl_ble_ip') ? 'http://'+localStorage.getItem('tsl_ble_ip')+':5000' : '',
+  };
+  const u=ips[m]||document.getElementById('sUrl').value;
+  return u||'';
 }
 function api(m,p){
   const u=getUrl()+'/api/'+p;
-  if(!u||u.includes('x.x'))return Promise.resolve(null);
+  if(!u||u.includes('x.x')||!u.startsWith('http'))return Promise.resolve(null);
   const h={'Content-Type':'application/json'};const t=document.getElementById('sTok').value;if(t)h['X-Api-Token']=t;
   return fetch(u,{method:m,headers:h,signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null).catch(()=>null);
 }
@@ -754,13 +789,34 @@ function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e
 // ═══ INIT ═══
 function init(){
   setInterval(()=>{const n=new Date();document.getElementById('ckTime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')},1e3);
-  document.querySelectorAll('.mc').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.mc').forEach(x=>x.classList.remove('on'));c.classList.add('on')}));
+  
+  // Restore saved mode
+  const savedMode=localStorage.getItem('tsl_mode')||'tailscale';
+  document.querySelectorAll('.mc').forEach(c=>{c.classList.remove('on');if(c.dataset.m===savedMode)c.classList.add('on')});
+  
+  const sv=d=>document.getElementById(d);
+  sv('sUrl').value=localStorage.getItem('tsl_srv')||'';
+  sv('sTok').value=localStorage.getItem('tsl_tok')||'';
+  sv('sTS').value=localStorage.getItem('tsl_ts')||'100.82.77.65';
+  sv('sDDNS').value=localStorage.getItem('tsl_ddns')||'remote.openfrunk.com';
+  sv('sWiFi').value=localStorage.getItem('tsl_wifi')||'10.10.10.140';
+  
+  // Save settings on input change
+  ['sUrl','sTS','sDDNS','sWiFi'].forEach(id=>{
+    const el=sv(id);if(!el)return;
+    el.addEventListener('input',()=>localStorage.setItem('tsl_'+id.slice(1),el.value));
+  });
+  
+  // Mode selector click
+  document.querySelectorAll('.mc').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('.mc').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');
+    localStorage.setItem('tsl_mode',c.dataset.m);
+    toast('🔗 已切换到 '+{tailscale:'Tailscale',ddns:'DDNS',wifi:'WiFi',ble:'蓝牙'}[c.dataset.m]||c.dataset.m);
+  }));
+  
   loadV();renderVP();updUI();
   setInterval(pollS,10e3);pollS();
-  document.getElementById('sUrl').value=localStorage.getItem('tsl_srv')||'';
-  document.getElementById('sTok').value=localStorage.getItem('tsl_tok')||'';
-  document.getElementById('sTS').value=localStorage.getItem('tsl_ts')||'';
-  document.getElementById('sDDNS').value=localStorage.getItem('tsl_ddns')||'';
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
