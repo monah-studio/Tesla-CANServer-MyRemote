@@ -15,7 +15,7 @@
   <img src="assets/app_ui.png" alt="Tesla Model S CAN Server App Preview" width="600">
 </p>
 
-> **[ English ]** · **[ 简体中文 ]** · **[ 日本語 ]** · **[ 한국어 ]**
+> **[ English ](#english)** · **[ 简体中文 ](#简体中文)** · **[ 日本語 ](#日本語)** · **[ 한국어 ](#한국어)**
 
 ---
 
