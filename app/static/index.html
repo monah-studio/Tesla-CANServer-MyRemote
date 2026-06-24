@@ -492,6 +492,27 @@ body{font-family:-apple-system,'Inter','PingFang HK','Helvetica Neue',sans-serif
       <label>🌍 DDNS 域名</label><input type="text" id="sDDNS" placeholder="remote.openfrunk.com">
       <label>🏠 本地 WiFi IP</label><input type="text" id="sWiFi" placeholder="10.10.10.140">
     </div>
+
+    <!-- NFC Card Access -->
+    <div class="sec-t" style="font-size:11px;font-weight:600;padding:12px 2px 6px;border-top:1px solid var(--cardBorder);margin-top:12px">💳 NFC 卡片开锁</div>
+    <div class="add-f" style="margin:0 0 4px">
+      <label style="font-size:10px">已授权卡片</label>
+      <div id="nfcCardList" style="margin-bottom:6px">
+        <div style="font-size:11px;color:var(--textDim);text-align:center;padding:8px">暂无卡片</div>
+      </div>
+      <div class="vin-r"><input type="text" id="nfcUID" placeholder="刷卡自动填" style="text-transform:uppercase;font-family:monospace"><button onclick="addNfcCard()">添加</button></div>
+      <label style="font-size:10px;margin-top:8px">操作</label>
+      <select id="nfcAction" style="width:100%;background:var(--surface2);border:1px solid var(--cardBorder);border-radius:var(--radiusXs);padding:8px 10px;color:var(--onSurface);font-size:12px;outline:none;font-family:inherit">
+        <option value="unlock">🔓 解锁车门</option>
+        <option value="lock">🔒 锁门</option>
+        <option value="frunk">🟢 开前备箱</option>
+        <option value="trunk">🟤 开后备箱</option>
+      </select>
+      <div style="margin-top:8px;background:var(--surface2);border-radius:var(--radiusXs);padding:10px;font-size:11px;color:var(--textDim);line-height:1.5">
+        📌 将 NFC 卡贴在读卡器上自动识别 UID 并执行操作。<br>
+        🔜 NFC 读卡器硬件支持即将到来。
+      </div>
+    </div>
   </div>
 
 </div>
@@ -688,6 +709,39 @@ function sCmd(c){
 // ═══ CLIMATE ═══
 function adjTemp(d){/* stub */}
 
+// ═══ NFC CARDS ═══
+let nfcCards=JSON.parse(localStorage.getItem('tsl_nfc')||'[]');
+function renderNfcCards(){
+  const l=document.getElementById('nfcCardList');
+  if(!nfcCards.length){
+    l.innerHTML='<div style="font-size:11px;color:var(--onSurfaceDim);text-align:center;padding:8px">暂无卡片</div>';
+    return;
+  }
+  l.innerHTML=nfcCards.map((c,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:var(--surface2);margin-bottom:4px;font-size:12px">'
+    +'<span>💳</span><span style="flex:1;font-family:monospace;font-size:11px">'+c.uid+'</span>'
+    +'<span style="font-size:10px;color:var(--onSurfaceDim)">→ '+(c.action==='unlock'?'🔓解锁':c.action==='lock'?'🔒锁门':c.action==='frunk'?'🟢前箱':'🟤后箱')+'</span>'
+    +'<span onclick="delNfcCard('+i+')" style="cursor:pointer;color:var(--red);font-size:14px">✕</span>'
+    +'</div>').join('');
+}
+function addNfcCard(){
+  const uid=document.getElementById('nfcUID').value.trim().toUpperCase();
+  if(!uid||uid.length<4){toast('⚠️ 请先刷卡或输入 UID');return}
+  if(nfcCards.find(c=>c.uid===uid)){toast('⚠️ 卡片已存在');return}
+  const action=document.getElementById('nfcAction').value;
+  nfcCards.push({uid,action,name:'Card '+(nfcCards.length+1)});
+  localStorage.setItem('tsl_nfc',JSON.stringify(nfcCards));
+  document.getElementById('nfcUID').value='';
+  renderNfcCards();
+  // Sync to server
+  api('POST','nfc/cards',JSON.stringify({uid,action})).then(r=>toast(r?.success?'✅ 卡片已添加':'⚠️ 离线保存'));
+}
+function delNfcCard(i){
+  nfcCards.splice(i,1);
+  localStorage.setItem('tsl_nfc',JSON.stringify(nfcCards));
+  renderNfcCards();
+  toast('🗑️ 已删除');
+}
+
 // ═══ NETWORK ═══
 
 /* ── BLE Discovery ── */
@@ -725,11 +779,11 @@ function getUrl(){
   const u=ips[m]||document.getElementById('sUrl').value;
   return u||'';
 }
-function api(m,p){
+function api(m,p,b){
   const u=getUrl()+'/api/'+p;
   if(!u||u.includes('x.x')||!u.startsWith('http'))return Promise.resolve(null);
   const h={'Content-Type':'application/json'};const t=document.getElementById('sTok').value;if(t)h['X-Api-Token']=t;
-  return fetch(u,{method:m,headers:h,signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null).catch(()=>null);
+  return fetch(u,{method:m,headers:h,body:b||null,signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():null).catch(()=>null);
 }
 
 async function pollS(){
@@ -815,7 +869,7 @@ function init(){
     toast('🔗 已切换到 '+{tailscale:'Tailscale',ddns:'DDNS',wifi:'WiFi',ble:'蓝牙'}[c.dataset.m]||c.dataset.m);
   }));
   
-  loadV();renderVP();updUI();
+  loadV();renderVP();updUI();renderNfcCards();
   setInterval(pollS,10e3);pollS();
 }
 document.addEventListener('DOMContentLoaded',init);
