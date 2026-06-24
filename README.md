@@ -361,7 +361,6 @@ This project builds on the shoulders of these open-source communities:
 | PWA (current) | ✅ Live |
 | iOS IPA sideload | 🔜 Planned |
 | Android APK | 🔜 Planned |
-| **Apple CarKey / Google CarKey emulation** | 🔜 Needs NFC hardware + BLE handover |
 
 ### Phase 5 — Production Release 🏁
 | Item | Status |
