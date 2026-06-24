@@ -399,6 +399,12 @@ bash network/setup_network.sh
 - [Tesla Vehicle Command SDK](https://github.com/teslamotors/vehicle-command) — For 2021+ models with BLE support
 - [Comma.ai OpenPilot](https://github.com/commaai/openpilot) — ADAS system
 
+## 📅 Timeline
+
+> ⏳ **Estimated completion: ~3 months remaining.** This is a prototype in active development. The CAN bus hardware (CANable 2.0) has been ordered for testing. A detailed hardware bill of materials and wiring guide will be published once fully verified on the vehicle.
+
+---
+
 ## 🙏 Credits / 致谢
 
 This project would not exist without these open-source projects and communities:
@@ -411,16 +417,23 @@ This project would not exist without these open-source projects and communities:
 | [**python-can**](https://github.com/hardbyte/python-can) | Python CAN library |
 | [**Flask**](https://flask.palletsprojects.com) | Web framework for the REST API server |
 | [**Tailscale**](https://tailscale.com) | Zero-config VPN — secure remote access to the car |
-| [**Orange Pi 4 Pro**](http://www.orangepi.org) | The SBC running the server (Raspberry Pi alternative) |
-| [**Tesla Vehicle Command SDK**](https://github.com/teslamotors/vehicle-command) | Tesla's official BLE/cloud API for 2021+ models |
-| [**Comma.ai OpenPilot**](https://github.com/commaai/openpilot) | ADAS system — pushing the boundaries of what's possible with cars |
+| [**InfluxDB**](https://www.influxdata.com) | Time-series database for battery health and driving data |
+| [**Grafana**](https://grafana.com) | Battery health visualization and analytics dashboards |
+| [**Telegraf**](https://www.influxdata.com/time-series-platform/telegraf/) | Metrics collection agent for CAN bus data |
+| [**Cloudflare Tunnel**](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) | Secure HTTPS tunnel without VPN — phone access anywhere |
+| [**React**](https://react.dev) + [**Recharts**](https://recharts.org) | Battery analytics dashboard UI |
+| [**Material Design 3**](https://m3.material.io) | Design system for the mobile control panel |
+| [**Orange Pi 4 Pro**](http://www.orangepi.org) | The SBC running the server — 6GB, 3 TOPS edge AI |
+| [**Armbian / Orange Pi OS**](https://www.armbian.com) | Linux distribution powering the Orange Pi |
+| [**Tesla Vehicle Command SDK**](https://github.com/teslamotors/vehicle-command) | Tesla's official BLE/cloud API (reference only — not used directly) |
+| [**Comma.ai OpenPilot**](https://github.com/commaai/openpilot) | ADAS system — pushing boundaries of what's possible with cars |
 | [**OpenGarages**](https://opengarages.org) | Community of hackers reverse-engineering vehicle protocols |
+| [**Hermes Agent**](https://github.com/NousResearch/hermes-agent) | AI agent that built and debugged large parts of this project |
+| [**Namecheap**](https://namecheap.com) + [**DuckDNS**](https://duckdns.org) | DDNS services for remote.openfrunk.com |
 
 **Special thanks** to the reverse-engineering community on [Tesla Motors Club](https://teslamotorsclub.com) and the CAN bus hacking forums — the collective knowledge that made this possible.
 
-### License
-
-MIT — do whatever you want. Just don't sue me if your car does something unexpected. This is a side project, not a product.
+Built with lots of ☕ and stubbornness in Hong Kong SAR.
 
 ---
 
